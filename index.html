@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Red Flags</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="title-screen" id="titleScreen" onclick="startGame()">
+  <div class="title-accent"></div>
+  <div class="title-line t1">Red Flags</div>
+  <div class="title-line t2">You are not the main character<br>of this story.</div>
+  <div class="title-line t3">A story about watching someone you love<br>disappear in plain sight.</div>
+  <div class="title-line t4">Click anywhere to begin</div>
+</div>
+
+<div class="sa-delta" id="saDelta"></div>
+<div class="telltale-prompt" id="telltalePrompt"></div>
+
+<aside class="timeline">
+  <div class="timeline-header">
+    <div class="timeline-title">Tracking</div>
+    <div class="timeline-name">Hannah Chen</div>
+    <div class="timeline-sub">31 · Marketing</div>
+  </div>
+  <div class="sa-bar-wrap">
+    <div class="sa-bar-label">Self-Awareness <span id="saLabel">Intact</span></div>
+    <div class="sa-bar-track"><div class="sa-bar-fill" id="saBarFill" style="width:70%;background:var(--green)"></div></div>
+  </div>
+  <div class="last-noted-wrap" id="lastNotedWrap">
+    <div class="last-noted-label">Last noted</div>
+    <div class="last-noted-text" id="lastNotedText">—</div>
+  </div>
+  <div class="timeline-scroll" id="timelineScroll"></div>
+</aside>
+
+<main class="main">
+  <div class="chat-header">
+    <div class="avatar" id="avatar">H</div>
+    <div>
+      <div class="chat-name">Hannah Chen</div>
+      <div class="chat-status" id="chatStatus">March 2023</div>
+    </div>
+  </div>
+  <div class="messages" id="messages"></div>
+  <div class="epilogue-screen" id="epilogueScreen"></div>
+  <div class="choices" id="choicesArea" style="display:none">
+    <div class="choices-label">How do you respond?</div>
+  </div>
+  <div class="nav-area" id="navArea">
+    <button class="nav-btn" id="prevBtn" onclick="navigate(-1)" disabled>← Previous</button>
+    <span class="nav-progress" id="navProgress">1 / 7</span>
+    <button class="nav-btn" id="nextBtn" onclick="navigate(1)">Next →</button>
+  </div>
+</main>
+
+<script src="js/stories/hannah.js"></script>
+<script src="js/cases.js"></script>
+<script src="js/engine.js"></script>
+</body>
+</html>
