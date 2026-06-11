@@ -7,7 +7,7 @@ const EVENTS = [
   {
     id:0, month:"2023年3月", title:"她說她遇到了一個人", type:"sweet", date:"三月底，週五夜晚",
     lastNoted:"他叫 Marcus。他……不一樣。",
-    telltale: { a:"Hannah 記住了這一刻。", b:"Hannah 記住了這一刻。" },
+    telltale: null,
     messages:[
       {from:"her", time:"晚上9:47", text:"我有事要告訴你!!"},
       {from:"her", time:"晚上9:47", text:"我在 app 上認識了一個人"},
@@ -27,7 +27,7 @@ const EVENTS = [
   {
     id:1, month:"2023年4月", title:"他記住了那個餅乾的事", type:"sweet", date:"四月，週日下午",
     lastNoted:"我差點哭出來。我已經忘了我有告訴他那件事。",
-    telltale: { a:"Hannah 記住了這一刻。", b:"Hannah 記住了這一刻。" },
+    telltale: { a:"Hannah 想了一下才回覆。", b:null },
     messages:[
       {from:"her", time:"下午2:23", text:"發生了一件有點離譜的事"},
       {from:"her", time:"下午2:24", text:"你知道我曾經說過我小時候超愛那個日本餅乾嗎\n就是那個已經停產的"},
@@ -51,7 +51,7 @@ const EVENTS = [
   {
     id:2, month:"2023年5月", title:"她說她好久沒有這種感覺了", type:"sweet", date:"五月，週三深夜",
     lastNoted:"我好久沒有被這樣看見的感覺了。",
-    telltale: { a:"Hannah 記住了這一刻。", b:"Hannah 注意到了。" },
+    telltale: { a:null, b:"Hannah 注意到了。" },
     messages:[
       {from:"her", time:"深夜11:11", text:"我可以說一件有點丟臉的事嗎"},
       {from:"her", time:"深夜11:12", text:"我們今晚通了兩個小時的電話\n掛掉的時候我才發現我一直在笑\n我的臉真的很酸"},
@@ -70,7 +70,7 @@ const EVENTS = [
   {
     id:3, month:"2023年7月", title:"他為了那頓晚餐不高興", type:"has-flag", date:"七月，週一",
     lastNoted:"我想他只是真的很在乎。",
-    telltale: { a:"Hannah 記住了這一刻。", b:"Hannah 記住了這一刻。" },
+    telltale: { a:"Hannah 自己把邏輯追完了。", b:null },
     messages:[
       {from:"her", time:"中午12:08", text:"就是。Marcus 昨晚有點怪怪的。"},
       {from:"her", time:"中午12:09", text:"我去參加 Sarah 的生日聚餐，他說他以為週六是「我們的時間」"},
@@ -90,7 +90,7 @@ const EVENTS = [
   {
     id:4, month:"2023年9月", title:"她的回覆越來越慢", type:"has-flag", date:"九月",
     lastNoted:"不要想太多啦哈哈",
-    telltale: { a:"Hannah 記住了這一刻。", b:"Hannah 記住了這一刻。" },
+    telltale: { a:null, b:"Hannah 知道你在看著。" },
     epilogueNote: "九月，她的回覆開始變慢。那個月她取消了兩次約定。她說她一直在和 Marcus 一起。",
     messages:[
       {from:"her", time:"（你傳了一則關心訊息）", text:null, isNote:true},
@@ -110,7 +110,7 @@ const EVENTS = [
   {
     id:5, month:"2023年11月", title:"他說你們講太多了", type:"danger", date:"十一月，週四深夜",
     lastNoted:"他說這樣比較健康。",
-    telltale: { a:"Hannah 記住了這一刻。", b:"Hannah 記住了這一刻。" },
+    telltale: { a:"Hannah 沒有馬上回覆。", b:"Hannah 記住了你說的話。" },
     messages:[
       {from:"her", time:"深夜10:34", text:"嘿。我有事要告訴你。\n不要不高興。"},
       {from:"her", time:"深夜10:35", text:"Marcus 說他覺得我跟你分享了太多我們的事。"},
@@ -148,6 +148,44 @@ const EVENTS = [
     alert:null, mirror:null, isLast:true,
   },
 ];
+
+// ── INTERLUDES ──
+// 章節之間的時間流逝蒙太奇。key 是「播完哪個事件之後」的事件 id。
+// 玩家只能輕點翻過，不能選擇、不能回應——這就是旁觀者的處境。
+const INTERLUDES = {
+  2: { // 2023年5月 → 7月
+    period:"2023年6月",
+    fragments:[
+      "她的限時動態：海邊，兩個人的影子。\n配字只有一顆白色愛心。\n\n你按了愛心。",
+      "朋友群組裡，她說這次聚餐不去了。\n「你們玩！下次一定！！」\n\n三個驚嘆號。跟平常一樣。",
+      "你隨手傳了「最近好嗎」。\n隔天中午她回：\n\n「超好 跟你說 他連我對香菜過敏都記得 😳」",
+    ],
+  },
+  3: { // 2023年7月 → 9月
+    period:"2023年8月",
+    fragments:[
+      "她的限時動態變少了。\n整個八月只有兩則。\n\n一則是 Marcus 幫她拍的。\n一則是 Marcus。",
+      "你問她週五要不要去看那部她說想看的電影。\n隔了一天，她回：\n\n「那週可能不行欸 Marcus 訂了餐廳\n下次喔！」",
+      "群組裡有人問她怎麼沒去瑜伽課了。\n她說最近比較忙。\n\n那堂課她上了三年。",
+    ],
+  },
+  4: { // 2023年9月 → 11月
+    period:"2023年10月",
+    fragments:[
+      "她換了大頭貼。新的那張是 Marcus 拍的。\n照片裡她在笑。\n\n你說不上來哪裡不一樣。",
+      "朋友群組裡，要往上滑很久\n才找得到她上一次說話。\n\n有人貼了她以前一定會接的梗。\n沒有人接。",
+      "你傳：「好久不見。想你了。」\n\n已讀。\n\n你等了三天。\n你告訴自己她只是在忙。",
+    ],
+  },
+  5: { // 2023年11月 → 2024年1月
+    period:"2023年12月",
+    fragments:[
+      "十二月，她什麼都沒有發。\n\n你點進她的頁面，\n確認帳號還在。\n\n還在。",
+      "群組裡大家在約跨年。\n她沒有讀。",
+      "跨年夜 23:59，你傳了：\n「新年快樂。我在這裡。」\n\n煙火放完了。\n\n沒有回音。",
+    ],
+  },
+};
 
 // ── FATE POOL ──
 const FATES = [

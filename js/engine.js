@@ -84,7 +84,6 @@ function applyChoice(eventId, opt) {
   const passive = PASSIVE_EROSION[ev.type] || 0;
   SA = Math.max(0, Math.min(100, SA + delta + passive));
   updateSABar();
-  flashDelta(delta + passive);
 }
 
 function updateSABar() {
@@ -97,21 +96,15 @@ function updateSABar() {
   label.style.color = info.cls === 'high' ? 'var(--green)' : info.cls === 'mid' ? 'var(--warning)' : 'var(--accent)';
 }
 
-function flashDelta(delta) {
-  if (delta === 0) return;
-  const el = document.getElementById('saDelta');
-  el.className = `sa-delta ${delta > 0 ? 'pos' : 'neg'}`;
-  el.textContent = delta > 0 ? `↑ 自我察覺 +${delta}` : `↓ 自我察覺 ${delta}`;
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 1800);
-}
-
 // ── TELLTALE PROMPT ──
+// 延遲一拍才浮現，避免跟選擇後的回覆動畫擠在同一瞬間
 function showTelltale(text) {
   const el = document.getElementById('telltalePrompt');
-  el.textContent = text;
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 3200);
+  setTimeout(() => {
+    el.textContent = text;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 4000);
+  }, 700);
 }
 
 // ── LAST NOTED ──
@@ -126,15 +119,28 @@ function updateLastNoted(text) {
 
 // ── SIDEBAR ──
 function showSidebar() {
-  document.getElementById('timelineSidebar').classList.add('revealed');
+  const tl = document.getElementById('timelineSidebar');
+  tl.classList.remove('peek');
+  tl.classList.add('revealed');
 }
 
 function hideSidebar() {
   document.getElementById('timelineSidebar').classList.remove('revealed');
 }
 
+// 遊戲中的「回顧」模式：只顯示走過的足跡，不顯示 SA 條與未來事件
+function togglePeek() {
+  const tl = document.getElementById('timelineSidebar');
+  if (tl.classList.contains('revealed')) return; // 結局畫面已是完整版
+  const on = !tl.classList.contains('peek');
+  if (on) buildTimeline(false);
+  tl.classList.toggle('peek', on);
+}
+
 // ── EPILOGUE ──
 function showEpilogue() {
+  clearRenderTimers();
+  document.getElementById('peekBtn').style.display = 'none';
   currentFate = rollFate(SA);
   document.getElementById('messages').style.display = 'none';
   document.getElementById('choicesArea').style.display = 'none';
@@ -280,6 +286,7 @@ function showEpilogue() {
 function resetGame() {
   localStorage.removeItem(SAVE_KEY);
   chosen = {}; current = 0; currentFate = null; SA = 70;
+  document.getElementById('peekBtn').style.display = '';
   document.getElementById('avatar').classList.remove('faded');
   document.getElementById('messages').style.display = 'flex';
   document.getElementById('navArea').style.display = 'flex';
@@ -299,7 +306,9 @@ function buildTimeline(epActive) {
   let lastMonth = '';
   EVENTS.forEach((ev, i) => {
     if (ev.month !== lastMonth) {
-      const ml = document.createElement('div'); ml.className = 'month-label'; ml.textContent = ev.month;
+      const ml = document.createElement('div');
+      ml.className = 'month-label' + (!epActive && i > current ? ' locked' : '');
+      ml.textContent = ev.month;
       scroll.appendChild(ml); lastMonth = ev.month;
     }
     const item = document.createElement('div');
@@ -322,7 +331,13 @@ function buildTimeline(epActive) {
 }
 
 // ── RENDER ──
+// 動畫計時器集中管理：重新渲染前全部取消，避免新舊動畫互相干擾
+let renderTimers = [];
+function schedule(fn, ms) { renderTimers.push(setTimeout(fn, ms)); }
+function clearRenderTimers() { renderTimers.forEach(clearTimeout); renderTimers = []; }
+
 function renderEvent(idx) {
+  clearRenderTimers();
   const ev = EVENTS[idx];
   const msgs = document.getElementById('messages');
   msgs.innerHTML = '';
@@ -363,24 +378,26 @@ function renderEvent(idx) {
   document.getElementById('choicesArea').style.display = 'none';
   document.getElementById('nextBtn').disabled = true;
 
-  let delay = 200;
-  const TYPING_DURATION = 700;
-  const BETWEEN_GAP = 120;
+  // 節奏依訊息長度而定：長訊息打比較久，冒出來之後留時間讀，才開始打下一則
+  let delay = 400;
 
   ev.messages.forEach((m, i) => {
     if (m.isNote) {
-      setTimeout(() => {
+      schedule(() => {
         const n = document.createElement('div');
         n.style.cssText = 'font-family:var(--font-mono);font-size:10px;color:var(--text-dimmer);padding:4px 0;font-style:italic;';
         n.textContent = m.time; rows.appendChild(n);
         msgs.scrollTop = msgs.scrollHeight;
       }, delay);
-      delay += 200;
+      delay += 700;
       return;
     }
 
+    const typeTime = Math.min(2400, Math.max(800, m.text.length * 45));   // 打字中
+    const readTime = Math.min(1600, Math.max(500, m.text.length * 28));   // 讀這一則
+
     const typingDelay = delay;
-    setTimeout(() => {
+    schedule(() => {
       const ind = document.createElement('div');
       ind.className = 'typing-indicator'; ind.id = `typing-${i}`;
       ind.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
@@ -388,8 +405,8 @@ function renderEvent(idx) {
       msgs.scrollTop = msgs.scrollHeight;
     }, typingDelay);
 
-    const bubbleDelay = delay + TYPING_DURATION;
-    setTimeout(() => {
+    const bubbleDelay = typingDelay + typeTime;
+    schedule(() => {
       const ind = document.getElementById(`typing-${i}`);
       if (ind) ind.remove();
       const b = document.createElement('div'); b.className = 'bubble her'; b.textContent = m.text;
@@ -399,11 +416,11 @@ function renderEvent(idx) {
       msgs.scrollTop = msgs.scrollHeight;
     }, bubbleDelay);
 
-    delay += TYPING_DURATION + BETWEEN_GAP;
+    delay = bubbleDelay + readTime;
   });
 
-  const totalDelay = delay + 300;
-  setTimeout(() => {
+  const totalDelay = delay + 400;
+  schedule(() => {
     if (ev.mirror) renderMirror(msgs, ev.mirror);
     if (ev.choice) showChoices(ev);
     document.getElementById('nextBtn').disabled = idx === EVENTS.length - 1;
@@ -454,7 +471,7 @@ function choose(opt) {
   showResponse(current, opt);
   document.getElementById('messages').scrollTop = 99999;
 
-  if (ev.telltale) showTelltale(ev.telltale[opt]);
+  if (ev.telltale && ev.telltale[opt]) showTelltale(ev.telltale[opt]);
   if (ev.lastNoted) updateLastNoted(ev.lastNoted);
   saveState();
 
@@ -491,11 +508,52 @@ function navigate(dir) {
   if (dir===1 && current===EVENTS.length-1 && chosen[current]) { showEpilogue(); return; }
   const next=current+dir;
   if (next<0||next>=EVENTS.length) return;
+  // 第一次往前走到新章節時，先播時間流逝蒙太奇（回頭重看不重播）
+  if (dir===1 && !chosen[next] && typeof INTERLUDES!=='undefined' && INTERLUDES[current]) {
+    showInterlude(INTERLUDES[current], () => goTo(next));
+    return;
+  }
   goTo(next);
+}
+
+// ── INTERLUDE ──
+// 章節之間的蒙太奇：玩家只能輕點翻過，不能選擇、不能回應。
+function showInterlude(data, then) {
+  const el = document.getElementById('interludeScreen');
+  el.innerHTML = `
+    <div class="interlude-period">${data.period}</div>
+    <div class="interlude-text" id="interludeText"></div>
+    <div class="interlude-hint">輕點繼續</div>`;
+  const textEl = el.querySelector('.interlude-text');
+  let step = -1;
+  let busy = false;
+  const advance = () => {
+    if (busy) return;
+    step++;
+    if (step >= data.fragments.length) {
+      el.onclick = null;
+      el.classList.remove('visible');
+      setTimeout(() => { el.innerHTML = ''; }, 600);
+      then();
+      return;
+    }
+    busy = true;
+    textEl.classList.remove('show');
+    setTimeout(() => {
+      textEl.textContent = data.fragments[step];
+      textEl.classList.add('show');
+      busy = false;
+    }, step === 0 ? 150 : 350);
+  };
+  el.onclick = advance;
+  el.classList.add('visible');
+  advance();
 }
 
 function goTo(idx) {
   current=idx; renderEvent(current);
+  // 回顧側欄開著的話，同步更新足跡
+  if (document.getElementById('timelineSidebar').classList.contains('peek')) buildTimeline(false);
   setTimeout(()=>{ document.getElementById('messages').scrollTop=0; },50);
 }
 
