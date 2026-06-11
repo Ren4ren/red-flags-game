@@ -55,10 +55,10 @@ function getPool(sa) {
 }
 
 function getSALabel(sa) {
-  if (sa >= 60) return {text:'Intact', cls:'high'};
-  if (sa >= 40) return {text:'Wavering', cls:'mid'};
-  if (sa >= 20) return {text:'Eroding', cls:'mid'};
-  return {text:'Almost gone', cls:'low'};
+  if (sa >= 60) return {text:'完整', cls:'high'};
+  if (sa >= 40) return {text:'動搖中', cls:'mid'};
+  if (sa >= 20) return {text:'消退中', cls:'mid'};
+  return {text:'幾乎消失', cls:'low'};
 }
 
 function seededRandom(seed) {
@@ -101,7 +101,7 @@ function flashDelta(delta) {
   if (delta === 0) return;
   const el = document.getElementById('saDelta');
   el.className = `sa-delta ${delta > 0 ? 'pos' : 'neg'}`;
-  el.textContent = delta > 0 ? `↑ Self-awareness +${delta}` : `↓ Self-awareness ${delta}`;
+  el.textContent = delta > 0 ? `↑ 自我察覺 +${delta}` : `↓ 自我察覺 ${delta}`;
   el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 1800);
 }
@@ -124,6 +124,15 @@ function updateLastNoted(text) {
   }, 400);
 }
 
+// ── SIDEBAR ──
+function showSidebar() {
+  document.getElementById('timelineSidebar').classList.add('revealed');
+}
+
+function hideSidebar() {
+  document.getElementById('timelineSidebar').classList.remove('revealed');
+}
+
 // ── EPILOGUE ──
 function showEpilogue() {
   currentFate = rollFate(SA);
@@ -132,6 +141,9 @@ function showEpilogue() {
   document.getElementById('navArea').style.display = 'none';
   document.getElementById('chatStatus').textContent = '2024–2025';
   if (currentFate.avatarFade) document.getElementById('avatar').classList.add('faded');
+
+  showSidebar();
+  buildTimeline(true);
 
   const ep = document.getElementById('epilogueScreen');
   ep.innerHTML = ''; ep.classList.add('visible');
@@ -142,12 +154,12 @@ function showEpilogue() {
   saCard.className = 'ep-sa-status';
   saCard.innerHTML = `
     <div>
-      <div class="ep-sa-label">Self-Awareness — Final State</div>
+      <div class="ep-sa-label">自我察覺——最終狀態</div>
       <div class="ep-sa-value ${saInfo.cls}">${saInfo.text} &nbsp;·&nbsp; ${SA}</div>
     </div>`;
   ep.appendChild(saCard);
 
-  // "Looking back" — deferred alert section
+  // "回頭看" — deferred alert section
   const hindsightNotes = EVENTS.filter(ev => ev.epilogueNote).map(ev => ev.epilogueNote);
   if (hindsightNotes.length > 0) {
     const lb = document.createElement('div');
@@ -155,7 +167,7 @@ function showEpilogue() {
     lb.style.cssText = 'margin-bottom:40px;';
     const lbHeader = document.createElement('div');
     lbHeader.className = 'ck-log-header';
-    lbHeader.innerHTML = `<span class="ck-log-subject">Looking back</span><span class="ck-log-date">March 2023 – January 2024</span>`;
+    lbHeader.innerHTML = `<span class="ck-log-subject">回頭看</span><span class="ck-log-date">2023年3月 – 2024年1月</span>`;
     lb.appendChild(lbHeader);
     hindsightNotes.forEach((note, i) => {
       const row = document.createElement('div');
@@ -176,7 +188,7 @@ function showEpilogue() {
     const mir = document.createElement('div');
     mir.className = 'ep-mirror';
     mir.innerHTML = `
-      <div class="ep-mirror-label">Where have you seen this before?</div>
+      <div class="ep-mirror-label">你在哪裡見過這些？</div>
       <div class="ep-mirror-text">${MIRROR.text}</div>
       <div class="ep-mirror-sources">${MIRROR.sourcesLabel}</div>
       <div class="ep-mirror-tags">${MIRROR.sources.map(s => `<span class="ep-mirror-tag">${s}</span>`).join('')}</div>`;
@@ -190,14 +202,14 @@ function showEpilogue() {
     caseBlock.className = 'ep-cases';
     const caseHeader = document.createElement('div');
     caseHeader.className = 'ep-cases-header';
-    caseHeader.innerHTML = `<span class="ep-cases-title">You are not the first to watch this</span><span class="ep-cases-sub">Real &amp; fiction</span>`;
+    caseHeader.innerHTML = `<span class="ep-cases-title">你不是第一個旁觀這一切的人</span><span class="ep-cases-sub">真實 ＆ 虛構</span>`;
     caseBlock.appendChild(caseHeader);
     selectedCases.forEach((c, i) => {
       const entry = document.createElement('div');
       entry.className = 'ep-case-entry';
       entry.style.animationDelay = `${i * 80}ms`;
       entry.innerHTML = `
-        <div class="ep-case-type ${c.type}">${c.type === 'real' ? 'Real' : 'Fiction'}</div>
+        <div class="ep-case-type ${c.type}">${c.type === 'real' ? '真實' : '虛構'}</div>
         <div class="ep-case-body">
           <div class="ep-case-title">${c.title}</div>
           <div class="ep-case-quote">${c.quote}</div>
@@ -212,8 +224,8 @@ function showEpilogue() {
   const logHeader = document.createElement('div'); logHeader.className = 'ck-log-header';
   const isDeadEnding = currentFate.id === 'dead';
   logHeader.innerHTML = isDeadEnding
-    ? `<span class="ck-log-subject" style="color:var(--accent)">She remembered.</span><span class="ck-log-date"></span>`
-    : `<span class="ck-log-subject">Hannah Chen — Event Log</span><span class="ck-log-date">Relationship began: March 2023</span>`;
+    ? `<span class="ck-log-subject" style="color:var(--accent)">她記住了。</span><span class="ck-log-date"></span>`
+    : `<span class="ck-log-subject">Hannah Chen — 事件記錄</span><span class="ck-log-date">關係開始：2023年3月</span>`;
   log.appendChild(logHeader);
 
   currentFate.entries.forEach((entry, i) => {
@@ -226,7 +238,7 @@ function showEpilogue() {
     const textEl = document.createElement('div');
     if (entry.void || entry.text === null) {
       textEl.className = 'ck-entry-text void';
-      textEl.textContent = '——  No further record.';
+      textEl.textContent = '——  此後無記錄。';
     } else {
       textEl.className = 'ck-entry-text'; textEl.textContent = entry.text;
     }
@@ -250,21 +262,19 @@ function showEpilogue() {
   }
 
   const iv = document.createElement('div'); iv.className = 'your-voice';
-  iv.innerHTML = `<div class="your-voice-label">Your inner voice</div><div class="your-voice-text">${currentFate.innerVoice}</div>`;
+  iv.innerHTML = `<div class="your-voice-label">你的內心</div><div class="your-voice-text">${currentFate.innerVoice}</div>`;
   ep.appendChild(iv);
 
   const stat = document.createElement('div'); stat.className = 'stat-block';
   stat.innerHTML = `
-    <div class="stat-main">In the US, 1 in 4 women experience severe intimate partner violence.</div>
-    <div class="stat-sub">What you saw was real.<br>What you felt was real.</div>
-    <div class="resources">National DV Hotline &nbsp;·&nbsp; 1-800-799-7233 &nbsp;·&nbsp; thehotline.org</div>`;
+    <div class="stat-main">在台灣，每 4 位女性中就有 1 位曾遭受親密伴侶暴力。</div>
+    <div class="stat-sub">你看見的是真實的。<br>你感受到的是真實的。</div>
+    <div class="resources">台灣家暴專線 113 &nbsp;·&nbsp; 全年 24 小時</div>`;
   ep.appendChild(stat);
 
   const replay = document.createElement('div'); replay.className = 'replay-area';
-  replay.innerHTML = `<button class="replay-btn" onclick="resetGame()">Play again</button><div class="replay-note">The same choices don't always lead to the same place.</div>`;
+  replay.innerHTML = `<button class="replay-btn" onclick="resetGame()">再玩一次</button><div class="replay-note">同樣的選擇，不一定通向同樣的地方。</div>`;
   ep.appendChild(replay);
-
-  buildTimeline(true);
 }
 
 function resetGame() {
@@ -277,6 +287,7 @@ function resetGame() {
   ep.classList.remove('visible'); ep.innerHTML = '';
   document.getElementById('lastNotedText').textContent = '—';
   updateSABar();
+  hideSidebar();
   buildTimeline(false);
   renderEvent(0);
 }
@@ -319,7 +330,7 @@ function renderEvent(idx) {
   document.getElementById('navProgress').textContent = `${idx+1} / ${EVENTS.length}`;
   document.getElementById('prevBtn').disabled = idx === 0;
   const isLastChosen = idx === EVENTS.length-1 && chosen[idx];
-  document.getElementById('nextBtn').textContent = isLastChosen ? 'See ending →' : 'Next →';
+  document.getElementById('nextBtn').textContent = isLastChosen ? '查看結局 →' : '下一段 →';
   document.getElementById('nextBtn').disabled = idx === EVENTS.length-1 && !chosen[idx];
 
   const dl = document.createElement('div');
@@ -346,7 +357,6 @@ function renderEvent(idx) {
     showResponse(idx, chosen[idx]);
     document.getElementById('choicesArea').style.display = 'none';
     msgs.scrollTop = msgs.scrollHeight;
-    buildTimeline(false);
     return;
   }
 
@@ -398,13 +408,12 @@ function renderEvent(idx) {
     if (ev.choice) showChoices(ev);
     document.getElementById('nextBtn').disabled = idx === EVENTS.length - 1;
     msgs.scrollTop = msgs.scrollHeight;
-    buildTimeline(false);
   }, totalDelay);
 }
 
 function renderMirror(msgs, mirror) {
   const mir = document.createElement('div'); mir.className = 'romance-mirror';
-  mir.innerHTML = `<div class="mirror-label">Where have you seen this before?</div><div class="mirror-question">${mirror.question}</div><div class="mirror-refs">${mirror.refs.map(r=>`<span class="mirror-tag">${r}</span>`).join('')}</div>`;
+  mir.innerHTML = `<div class="mirror-label">你在哪裡見過這些？</div><div class="mirror-question">${mirror.question}</div><div class="mirror-refs">${mirror.refs.map(r=>`<span class="mirror-tag">${r}</span>`).join('')}</div>`;
   msgs.appendChild(mir);
 }
 
@@ -450,7 +459,7 @@ function choose(opt) {
   saveState();
 
   if (ev.isLast) {
-    document.getElementById('nextBtn').textContent = 'See ending →';
+    document.getElementById('nextBtn').textContent = '查看結局 →';
     document.getElementById('nextBtn').disabled = false;
   }
 }
@@ -460,7 +469,7 @@ function showResponse(idx, opt) {
   const msgs = document.getElementById('messages');
   const responses = opt==='a' ? ev.responseA : ev.responseB;
   const youGrp=document.createElement('div'); youGrp.className='msg-group';
-  const yl=document.createElement('div'); yl.className='msg-sender you'; yl.textContent='You'; youGrp.appendChild(yl);
+  const yl=document.createElement('div'); yl.className='msg-sender you'; yl.textContent='你'; youGrp.appendChild(yl);
   const yr=document.createElement('div'); yr.className='bubble-row you';
   const yb=document.createElement('div'); yb.className=`bubble you ${opt==='b'?'opt-b':''}`;
   yb.textContent = opt==='a' ? ev.choice.a.text : ev.choice.b.text;
@@ -508,7 +517,6 @@ updateSABar();
 buildTimeline(false);
 renderEvent(current);
 if (hasSave && Object.keys(chosen).length > 0) {
-  // Skip title screen and restore last noted
   const ts = document.getElementById('titleScreen');
   ts.style.display = 'none';
   restoreLastNoted();
