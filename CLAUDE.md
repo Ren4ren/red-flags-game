@@ -49,11 +49,21 @@
 這是一個互動故事遊戲，網頁形式（HTML + CSS + JS）。
 作者是動畫師，不是程式設計師，請以非技術性語言溝通。
 
-**主要檔案：**
-- `index.html` — 遊戲主頁面
-- `css/style.css` — 視覺樣式
-- `js/engine.js` — 遊戲引擎邏輯（SA 系統、結局、渲染）
-- `js/stories/hannah.js` — Hannah 的故事內容（對話、選項、結局）
+**目前有兩條線（詳見企劃資料夾《專案定位說明 v1.3》）：**
+- **主線＝諷刺選集**——第一人稱滑卡約會，配對池裡有人類掠食者原型也有正常人，玩家自己分辨。**開發中。**
+- **Hannah 篇＝旁觀者零回饋實驗，已收尾、定為分支**，現階段不主動開發。
+
+**主要檔案 — 諷刺選集（主線）：**
+- `anthology.html` — 選集入口頁
+- `css/anthology.css` — 選集樣式（疊在 `css/style.css` 上）
+- `js/anthology/engine.js` — 選集引擎（池子即選單、傷痕特質、識人之眼）
+- `js/anthology/sebastian.js`、`daniel.js` — 各篇內容（EP1 愛情騙子、EP2 正常人）
+
+**主要檔案 — Hannah 篇（分支）：**
+- `index.html` — Hannah 主頁面
+- `css/style.css` — 共用視覺樣式
+- `js/engine.js` — Hannah 引擎（SA 系統、結局、渲染）
+- `js/stories/hannah.js` — Hannah 故事內容
 - `js/cases.js` — 結局頁面的參考案例資料庫
 
 ---

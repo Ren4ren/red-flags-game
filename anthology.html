@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Red Flags — 諷刺選集</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/anthology.css">
+</head>
+<body class="anth-body">
+
+<div class="title-screen" id="titleScreen" onclick="anthStart()">
+  <div class="title-accent"></div>
+  <div class="title-line t1">Red Flags — 選集</div>
+  <div class="title-line t2">池子裡什麼人都有。</div>
+  <div class="title-line t3">有些人是來戀愛的。<br>有些人是來上班的。<br>祝妳好運。</div>
+  <div class="title-line t4">點擊任意處開始</div>
+</div>
+
+<main class="main anth-main">
+
+  <!-- 池子（選單即遊戲） -->
+  <section class="pool" id="poolScreen">
+    <div class="pool-header">
+      <div class="pool-title">今晚的池子</div>
+      <div class="pool-sub">滑到誰，就是誰的故事。</div>
+    </div>
+    <div class="pool-cards" id="poolCards"></div>
+    <div class="pool-foot" id="poolFoot"></div>
+  </section>
+
+  <!-- 個人檔案（右滑前的最後一眼） -->
+  <section class="profile-view" id="profileView"></section>
+
+  <!-- 聊天（故事本體） -->
+  <section class="chat-wrap" id="chatWrap">
+    <div class="chat-header">
+      <div class="avatar" id="chatAvatar">?</div>
+      <div>
+        <div class="chat-name" id="chatName"></div>
+        <div class="chat-status" id="chatStatus"></div>
+      </div>
+      <button class="peek-btn" onclick="confirmExit()">放下手機</button>
+    </div>
+    <div class="messages" id="messages"></div>
+    <div class="choices" id="choicesArea" style="display:none">
+      <div class="choices-label">妳的回應</div>
+    </div>
+    <div class="nav-area" id="navArea">
+      <span class="nav-progress" id="navProgress"></span>
+      <button class="nav-btn" id="nextBtn" onclick="nextBeat()" disabled>繼續 →</button>
+    </div>
+  </section>
+
+  <!-- 結局與回顧 -->
+  <section class="epilogue-screen anth-ep" id="endingScreen"></section>
+
+</main>
+
+<script src="js/anthology/sebastian.js"></script>
+<script src="js/anthology/daniel.js"></script>
+<script src="js/anthology/engine.js"></script>
+</body>
+</html>
