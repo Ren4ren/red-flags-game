@@ -1,0 +1,7 @@
+# AI 工具環境（技能、代理設定）——不屬於遊戲內容
+.agents/
+.claude/skills/
+skills-lock.json
+
+# 打包輸出
+release/
