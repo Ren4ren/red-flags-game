@@ -50,11 +50,14 @@
 作者是動畫師，不是程式設計師，請以非技術性語言溝通。
 
 **主要檔案：**
-- `index.html` — 遊戲主頁面
+- `index.html` — 入口選單頁（選集／Hannah）
+- `hannah.html` — Hannah 篇主頁面（原 index.html）
 - `css/style.css` — 視覺樣式
 - `js/engine.js` — 遊戲引擎邏輯（SA 系統、結局、渲染）
 - `js/stories/hannah.js` — Hannah 的故事內容（對話、選項、結局）
 - `js/cases.js` — 結局頁面的參考案例資料庫
+
+**新增角色：** 作者會填《選集 角色設定卡 模板 v1》（在企劃資料夾），請照 `docs/新增角色-轉檔指南.md` 把它轉成角色檔並接進遊戲。
 
 ---
 

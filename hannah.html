@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Red Flags</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="title-screen" id="titleScreen" onclick="startGame()">
+  <div class="title-accent"></div>
+  <div class="title-line t1">Red Flags</div>
+  <div class="title-line t2">你不是這個故事的主角。</div>
+  <div class="title-line t3">關於目睹一個你愛的人<br>在你眼前慢慢消失的故事。</div>
+  <div class="title-line t4">點擊任意處開始</div>
+</div>
+
+<div class="telltale-prompt" id="telltalePrompt"></div>
+<div class="interlude" id="interludeScreen"></div>
+
+<aside class="timeline" id="timelineSidebar">
+  <div class="timeline-header">
+    <div class="timeline-title">追蹤中</div>
+    <div class="timeline-name">Hannah Chen</div>
+    <div class="timeline-sub">31 歲 · 行銷</div>
+  </div>
+  <div class="sa-bar-wrap">
+    <div class="sa-bar-label">自我察覺 <span id="saLabel">完整</span></div>
+    <div class="sa-bar-track"><div class="sa-bar-fill" id="saBarFill" style="width:70%;background:var(--green)"></div></div>
+  </div>
+  <div class="last-noted-wrap" id="lastNotedWrap">
+    <div class="last-noted-label">最後記錄</div>
+    <div class="last-noted-text" id="lastNotedText">—</div>
+  </div>
+  <div class="timeline-scroll" id="timelineScroll"></div>
+</aside>
+
+<main class="main">
+  <div class="chat-header">
+    <div class="avatar" id="avatar">H</div>
+    <div>
+      <div class="chat-name">Hannah Chen</div>
+      <div class="chat-status" id="chatStatus">2023年3月</div>
+    </div>
+    <button class="peek-btn" id="peekBtn" onclick="togglePeek()">回顧</button>
+  </div>
+  <div class="messages" id="messages"></div>
+  <div class="epilogue-screen" id="epilogueScreen"></div>
+  <div class="choices" id="choicesArea" style="display:none">
+    <div class="choices-label">你會怎麼回應？</div>
+  </div>
+  <div class="nav-area" id="navArea">
+    <button class="nav-btn" id="prevBtn" onclick="navigate(-1)" disabled>← 上一段</button>
+    <span class="nav-progress" id="navProgress">1 / 7</span>
+    <button class="nav-btn" id="nextBtn" onclick="navigate(1)">下一段 →</button>
+  </div>
+</main>
+
+<script src="js/stories/hannah.js"></script>
+<script src="js/cases.js"></script>
+<script src="js/engine.js"></script>
+</body>
+</html>

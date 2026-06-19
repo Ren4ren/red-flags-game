@@ -57,14 +57,21 @@
 - `anthology.html` — 選集入口頁
 - `css/anthology.css` — 選集樣式（疊在 `css/style.css` 上）
 - `js/anthology/engine.js` — 選集引擎（池子即選單、傷痕特質、識人之眼）
-- `js/anthology/sebastian.js`、`daniel.js` — 各篇內容（EP1 愛情騙子、EP2 正常人）
+- `js/anthology/sebastian.js`、`daniel.js`、`julian.js` — 各篇內容（EP1 愛情騙子、EP2 正常人、EP3 自戀型）
+
+**入口：**
+- `index.html` — 入口選單頁（選集／Hannah 兩個入口；2026-06-17 新增）
 
 **主要檔案 — Hannah 篇（分支）：**
-- `index.html` — Hannah 主頁面
+- `hannah.html` — Hannah 主頁面（原 index.html，2026-06-17 改名）
 - `css/style.css` — 共用視覺樣式
 - `js/engine.js` — Hannah 引擎（SA 系統、結局、渲染）
 - `js/stories/hannah.js` — Hannah 故事內容
 - `js/cases.js` — 結局頁面的參考案例資料庫
+
+**新增角色（將來自己擴充用）：**
+- 設定卡模板：企劃資料夾的《選集 角色設定卡 模板 v1》（作者填純文字）
+- 轉檔指南：`docs/新增角色-轉檔指南.md`（給 AI：照設定卡產出角色檔並完成註冊）
 
 ---
 

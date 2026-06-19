@@ -4,62 +4,83 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Red Flags</title>
-<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0d0d0f; --ink:#f0ece4; --dim:#a39eb5; --dimmer:#6b6680;
+    --line:#26232e; --card:#16151b;
+    --red:#b6443f; --purple:#6a5a8c;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:'Lora', Georgia, serif;
+    min-height:100vh; display:flex; align-items:center; justify-content:center;
+    padding:32px 20px;
+  }
+  .landing{ width:100%; max-width:760px; animation:fade .8s ease both; }
+  @keyframes fade{ from{opacity:0; transform:translateY(12px);} to{opacity:1; transform:none;} }
+
+  .brand{
+    font-family:'Space Mono', monospace; letter-spacing:.28em;
+    font-size:14px; color:var(--red); margin-bottom:14px;
+  }
+  .headline{ font-size:30px; line-height:1.35; margin-bottom:8px; }
+  .tagline{ color:var(--dim); font-size:15px; margin-bottom:36px; font-style:italic; }
+
+  .cards{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  @media (max-width:620px){ .cards{ grid-template-columns:1fr; } }
+
+  .entry{
+    display:block; text-decoration:none; color:inherit;
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:26px 24px 22px; position:relative; overflow:hidden;
+    transition:transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+  }
+  .entry::before{
+    content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+    background:var(--red); opacity:.75; transition:opacity .25s ease;
+  }
+  .entry.hannah::before{ background:var(--purple); }
+  .entry:hover{ transform:translateY(-4px); border-color:#3a3646; box-shadow:0 14px 40px rgba(0,0,0,.45); }
+  .entry:hover::before{ opacity:1; }
+
+  .tag{
+    font-family:'Space Mono', monospace; font-size:11px; letter-spacing:.18em;
+    color:var(--dimmer); margin-bottom:14px;
+  }
+  .entry.hannah .tag{ color:var(--dimmer); }
+  .title{ font-size:22px; margin-bottom:10px; }
+  .desc{ color:var(--dim); font-size:14px; line-height:1.7; margin-bottom:20px; }
+  .go{ font-family:'Space Mono', monospace; font-size:13px; color:var(--ink); opacity:.65; }
+  .entry:hover .go{ opacity:1; }
+
+  .foot{ margin-top:30px; color:var(--dimmer); font-size:12px; }
+</style>
 </head>
 <body>
+  <main class="landing">
+    <div class="brand">RED FLAGS</div>
+    <div class="headline">池子裡什麼人都有。</div>
+    <div class="tagline">有些人是來戀愛的。有些人是來上班的。有些人是來收割的。</div>
 
-<div class="title-screen" id="titleScreen" onclick="startGame()">
-  <div class="title-accent"></div>
-  <div class="title-line t1">Red Flags</div>
-  <div class="title-line t2">你不是這個故事的主角。</div>
-  <div class="title-line t3">關於目睹一個你愛的人<br>在你眼前慢慢消失的故事。</div>
-  <div class="title-line t4">點擊任意處開始</div>
-</div>
+    <div class="cards">
+      <a class="entry" href="anthology.html">
+        <div class="tag">主線 · 開發中</div>
+        <div class="title">諷刺選集</div>
+        <div class="desc">第一人稱滑卡約會。配對池裡有掠食者，也有正常人——自己分辨，自己決定要不要走。</div>
+        <div class="go">進入 →</div>
+      </a>
 
-<div class="telltale-prompt" id="telltalePrompt"></div>
-<div class="interlude" id="interludeScreen"></div>
-
-<aside class="timeline" id="timelineSidebar">
-  <div class="timeline-header">
-    <div class="timeline-title">追蹤中</div>
-    <div class="timeline-name">Hannah Chen</div>
-    <div class="timeline-sub">31 歲 · 行銷</div>
-  </div>
-  <div class="sa-bar-wrap">
-    <div class="sa-bar-label">自我察覺 <span id="saLabel">完整</span></div>
-    <div class="sa-bar-track"><div class="sa-bar-fill" id="saBarFill" style="width:70%;background:var(--green)"></div></div>
-  </div>
-  <div class="last-noted-wrap" id="lastNotedWrap">
-    <div class="last-noted-label">最後記錄</div>
-    <div class="last-noted-text" id="lastNotedText">—</div>
-  </div>
-  <div class="timeline-scroll" id="timelineScroll"></div>
-</aside>
-
-<main class="main">
-  <div class="chat-header">
-    <div class="avatar" id="avatar">H</div>
-    <div>
-      <div class="chat-name">Hannah Chen</div>
-      <div class="chat-status" id="chatStatus">2023年3月</div>
+      <a class="entry hannah" href="hannah.html">
+        <div class="tag">實驗分支 · 已收尾</div>
+        <div class="title">Hannah 篇</div>
+        <div class="desc">旁觀者視角。你看著朋友一步步走進一段關係，全程零回饋，結局才揭曉發生了什麼。</div>
+        <div class="go">進入 →</div>
+      </a>
     </div>
-    <button class="peek-btn" id="peekBtn" onclick="togglePeek()">回顧</button>
-  </div>
-  <div class="messages" id="messages"></div>
-  <div class="epilogue-screen" id="epilogueScreen"></div>
-  <div class="choices" id="choicesArea" style="display:none">
-    <div class="choices-label">你會怎麼回應？</div>
-  </div>
-  <div class="nav-area" id="navArea">
-    <button class="nav-btn" id="prevBtn" onclick="navigate(-1)" disabled>← 上一段</button>
-    <span class="nav-progress" id="navProgress">1 / 7</span>
-    <button class="nav-btn" id="nextBtn" onclick="navigate(1)">下一段 →</button>
-  </div>
-</main>
 
-<script src="js/stories/hannah.js"></script>
-<script src="js/cases.js"></script>
-<script src="js/engine.js"></script>
+    <div class="foot">點一個入口開始。</div>
+  </main>
 </body>
 </html>

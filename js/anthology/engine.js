@@ -2,8 +2,8 @@
 // 池子即選單：一張卡＝一篇。零回饋：遊戲中不顯示任何數值；
 // 特質只在回顧揭曉，只改味道、永不鎖內容。
 
-const EPISODES = { sebastian: EP_SEBASTIAN, daniel: EP_DANIEL };
-const POOL_ORDER = ['sebastian', 'daniel'];
+const EPISODES = { sebastian: EP_SEBASTIAN, daniel: EP_DANIEL, julian: EP_JULIAN };
+const POOL_ORDER = ['sebastian', 'daniel', 'julian'];
 
 // ── 特質定義 ──
 const TRAITS = {
@@ -13,6 +13,8 @@ const TRAITS = {
   jumpy:      { name: '草木皆兵', cls: 'scar', desc: '警覺第一次傷到人——傷到的是妳自己。' },
   trust:      { name: '重新學會信任', cls: 'good', desc: '傷會好。需要時間，和一個好的人。' },
   spoken:     { name: '說得出口', cls: 'good', desc: '妳把不安說出口，世界沒有塌。' },
+  selfdoubt:  { name: '我是不是想太多', cls: 'scar', desc: '他讓妳習慣懷疑自己的感覺。連生氣，都要先問是不是自己的錯。' },
+  holdfast:   { name: '守得住自己', cls: 'good', desc: '他想替妳重寫妳是誰。妳沒讓他。' },
 };
 
 // ── 存檔 ──
@@ -406,7 +408,7 @@ function finish(endKey) {
     if (result.remove) removeTrait(result.remove);
     if (result.add) addTrait(result.add);
     traitBlock = result;
-    traitBlock.healed = before && result.add;
+    traitBlock.healed = before && result.add && !result.regress;
   }
 
   const tierBefore = insightTier(state.insight);
@@ -489,10 +491,12 @@ function finish(endKey) {
     let nameHtml = '';
     if (traitBlock.add) {
       const tr = TRAITS[traitBlock.add];
-      nameHtml = `<div class="trait-award-name ${tr.cls}">${traitBlock.healed ? '✦ ' : '＋ '}${tr.name}</div>`;
+      const sym = traitBlock.regress ? '↘ ' : (traitBlock.healed ? '✦ ' : '＋ ');
+      nameHtml = `<div class="trait-award-name ${tr.cls}">${sym}${tr.name}</div>`;
     }
+    const awardLabel = traitBlock.regress ? '妳的卡片，倒退了一格' : ('妳的卡片' + (traitBlock.add ? '被改寫了' : ''));
     tb.innerHTML = `
-      <div class="trait-award-label">妳的卡片${traitBlock.add ? '被改寫了' : ''}</div>
+      <div class="trait-award-label">${awardLabel}</div>
       ${nameHtml}
       <div class="trait-award-desc">${(traitBlock.text || '').replace(/\n/g, '<br>')}</div>`;
     s.appendChild(tb);
