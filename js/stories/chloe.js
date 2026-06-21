@@ -6,12 +6,12 @@ const STORY_TAGS = ['love-bombing','schedule-control','isolation','self-erasure'
 const EVENTS = [
   {
     id:0, month:"2023年3月", title:"她說她遇到了一個人", type:"sweet", date:"三月底，週五夜晚",
-    lastNoted:"他叫 Marcus。他……不一樣。",
+    lastNoted:"他叫 Connor。他……不一樣。",
     telltale: null,
     messages:[
       {from:"her", time:"晚上9:47", text:"我有事要告訴你!!"},
       {from:"her", time:"晚上9:47", text:"我在 app 上認識了一個人"},
-      {from:"her", time:"晚上9:48", text:"他叫 Marcus。33歲，在廣告業工作。\n上週我們去喝了咖啡。\n他……不一樣。"},
+      {from:"her", time:"晚上9:48", text:"他叫 Connor。33歲，在廣告業工作。\n上週我們去喝了咖啡。\n他……不一樣。"},
       {from:"her", time:"晚上9:51", text:"你不問我怎麼個不一樣法嗎 😭"},
     ],
     choice:{
@@ -27,7 +27,7 @@ const EVENTS = [
   {
     id:1, month:"2023年4月", title:"他記住了那個餅乾的事", type:"sweet", date:"四月，週日下午",
     lastNoted:"我差點哭出來。我已經忘了我有告訴他那件事。",
-    telltale: { a:"Hannah 想了一下才回覆。", b:null },
+    telltale: { a:"Chloe 想了一下才回覆。", b:null },
     messages:[
       {from:"her", time:"下午2:23", text:"發生了一件有點離譜的事"},
       {from:"her", time:"下午2:24", text:"你知道我曾經說過我小時候超愛那個日本餅乾嗎\n就是那個已經停產的"},
@@ -51,7 +51,7 @@ const EVENTS = [
   {
     id:2, month:"2023年5月", title:"她說她好久沒有這種感覺了", type:"sweet", date:"五月，週三深夜",
     lastNoted:"我好久沒有被這樣看見的感覺了。",
-    telltale: { a:null, b:"Hannah 注意到了。" },
+    telltale: { a:null, b:"Chloe 注意到了。" },
     messages:[
       {from:"her", time:"深夜11:11", text:"我可以說一件有點丟臉的事嗎"},
       {from:"her", time:"深夜11:12", text:"我們今晚通了兩個小時的電話\n掛掉的時候我才發現我一直在笑\n我的臉真的很酸"},
@@ -70,9 +70,9 @@ const EVENTS = [
   {
     id:3, month:"2023年7月", title:"他為了那頓晚餐不高興", type:"has-flag", date:"七月，週一",
     lastNoted:"我想他只是真的很在乎。",
-    telltale: { a:"Hannah 自己把邏輯追完了。", b:null },
+    telltale: { a:"Chloe 自己把邏輯追完了。", b:null },
     messages:[
-      {from:"her", time:"中午12:08", text:"就是。Marcus 昨晚有點怪怪的。"},
+      {from:"her", time:"中午12:08", text:"就是。Connor 昨晚有點怪怪的。"},
       {from:"her", time:"中午12:09", text:"我去參加 Sarah 的生日聚餐，他說他以為週六是「我們的時間」"},
       {from:"her", time:"中午12:11", text:"他不是在生氣。只是說他覺得受傷。\n我不知道。我想他只是真的很在乎。"},
     ],
@@ -90,8 +90,8 @@ const EVENTS = [
   {
     id:4, month:"2023年9月", title:"她的回覆越來越慢", type:"has-flag", date:"九月",
     lastNoted:"不要想太多啦哈哈",
-    telltale: { a:null, b:"Hannah 知道你在看著。" },
-    epilogueNote: "九月，她的回覆開始變慢。那個月她取消了兩次約定。她說她一直在和 Marcus 一起。",
+    telltale: { a:null, b:"Chloe 知道你在看著。" },
+    epilogueNote: "九月，她的回覆開始變慢。那個月她取消了兩次約定。她說她一直在和 Connor 一起。",
     messages:[
       {from:"her", time:"（你傳了一則關心訊息）", text:null, isNote:true},
       {from:"her", time:"三小時後", text:"喔嘿！抱歉我漏看了。\n怎麼了？"},
@@ -102,25 +102,25 @@ const EVENTS = [
       b:{text:"你最近比較少出現。我只是想確認你還好。", sa:+3,
          note:"說出來了，但沒有責怪。她知道你在關注她。"},
     },
-    responseA:[{from:"her",time:"之後",text:"還好！只是最近花了很多時間跟 Marcus 在一起哈哈\n你懂的 🙂"}],
-    responseB:[{from:"her",time:"之後",text:"我沒事！只是最近很忙\n很多時間都跟 Marcus 在一起\n不要想太多啦哈哈"}],
+    responseA:[{from:"her",time:"之後",text:"還好！只是最近花了很多時間跟 Connor 在一起哈哈\n你懂的 🙂"}],
+    responseB:[{from:"her",time:"之後",text:"我沒事！只是最近很忙\n很多時間都跟 Connor 在一起\n不要想太多啦哈哈"}],
     alert:{type:"warning", label:"系統記錄", text:"聯絡頻率自七月起下降 44%。\n取消約定：本月 2 次。"},
     mirror:null,
   },
   {
     id:5, month:"2023年11月", title:"他說你們講太多了", type:"danger", date:"十一月，週四深夜",
     lastNoted:"他說這樣比較健康。",
-    telltale: { a:"Hannah 沒有馬上回覆。", b:"Hannah 記住了你說的話。" },
+    telltale: { a:"Chloe 沒有馬上回覆。", b:"Chloe 記住了你說的話。" },
     messages:[
       {from:"her", time:"深夜10:34", text:"嘿。我有事要告訴你。\n不要不高興。"},
-      {from:"her", time:"深夜10:35", text:"Marcus 說他覺得我跟你分享了太多我們的事。"},
+      {from:"her", time:"深夜10:35", text:"Connor 說他覺得我跟你分享了太多我們的事。"},
       {from:"her", time:"深夜10:36", text:"他不是說我不能跟你說話。\n只是有些事應該留在我們之間。\n你懂吧？"},
       {from:"her", time:"深夜10:38", text:"他說這樣比較健康。"},
     ],
     choice:{
       a:{text:"你怎麼想這件事？", sa:+3,
          note:"把問題還給她。如果她的自我察覺還在，她會感受到的。"},
-      b:{text:"Hannah。那不是關於隱私的事。那是控制。", sa:-2,
+      b:{text:"Chloe。那不是關於隱私的事。那是控制。", sa:-2,
          note:"沒錯——但說得太直接、太快了。她還沒準備好。她退縮了。"},
     },
     responseA:[{from:"her",time:"深夜10:41",text:"我是說……我覺得他說的有道理。\n感情不需要廣播出去。\n你沒有不高興吧？"}],
@@ -131,7 +131,7 @@ const EVENTS = [
   {
     id:6, month:"2024年1月", title:"她問你覺得她還好嗎", type:"danger", date:"深夜",
     lastNoted:"我已經分不清了。",
-    telltale: { a:"Hannah 在凌晨一點十八分問了你這個問題。", b:"Hannah 在凌晨一點十八分問了你這個問題。" },
+    telltale: { a:"Chloe 在凌晨一點十八分問了你這個問題。", b:"Chloe 在凌晨一點十八分問了你這個問題。" },
     messages:[
       {from:"her", time:"凌晨1:17", text:"你醒著嗎"},
       {from:"her", time:"凌晨1:18", text:"我只是想問你一件事。\n你覺得我還好嗎？\n就是。在你眼裡，我看起來還好嗎。"},
@@ -140,7 +140,7 @@ const EVENTS = [
     choice:{
       a:{text:"我在。你想告訴我發生什麼事嗎？", sa:+4,
          note:"你打開了門，但沒有推進去。這是最重要的一刻。"},
-      b:{text:"Hannah。你可以離開。不管發生了什麼——你可以離開的。", sa:+2,
+      b:{text:"Chloe。你可以離開。不管發生了什麼——你可以離開的。", sa:+2,
          note:"真實且必要。但她可能還沒準備好聽到這句話。"},
     },
     responseA:[{from:"her",time:"凌晨1:23",text:"……沒事。算了。\n我不知道我為什麼這樣說。\n謝謝你還醒著。"}],
@@ -164,15 +164,15 @@ const INTERLUDES = {
   3: { // 2023年7月 → 9月
     period:"2023年8月",
     fragments:[
-      "她的限時動態變少了。\n整個八月只有兩則。\n\n一則是 Marcus 幫她拍的。\n一則是 Marcus。",
-      "你問她週五要不要去看那部她說想看的電影。\n隔了一天，她回：\n\n「那週可能不行欸 Marcus 訂了餐廳\n下次喔！」",
+      "她的限時動態變少了。\n整個八月只有兩則。\n\n一則是 Connor 幫她拍的。\n一則是 Connor。",
+      "你問她週五要不要去看那部她說想看的電影。\n隔了一天，她回：\n\n「那週可能不行欸 Connor 訂了餐廳\n下次喔！」",
       "群組裡有人問她怎麼沒去瑜伽課了。\n她說最近比較忙。\n\n那堂課她上了三年。",
     ],
   },
   4: { // 2023年9月 → 11月
     period:"2023年10月",
     fragments:[
-      "她換了大頭貼。新的那張是 Marcus 拍的。\n照片裡她在笑。\n\n你說不上來哪裡不一樣。",
+      "她換了大頭貼。新的那張是 Connor 拍的。\n照片裡她在笑。\n\n你說不上來哪裡不一樣。",
       "朋友群組裡，要往上滑很久\n才找得到她上一次說話。\n\n有人貼了她以前一定會接的梗。\n沒有人接。",
       "你傳：「好久不見。想你了。」\n\n已讀。\n\n你等了三天。\n你告訴自己她只是在忙。",
     ],
@@ -196,7 +196,7 @@ const FATES = [
     title:"她離開了",
     avatarFade:false,
     entries:[
-      {date:"2024年秋天", title:"事件", text:"Hannah 結束了這段關係。\n她後來告訴你，她在一個週日早晨收拾了一個包\n趁他還在睡著的時候就走了出去。\n她說她不知道自己最後是怎麼做到的。"},
+      {date:"2024年秋天", title:"事件", text:"Chloe 結束了這段關係。\n她後來告訴你，她在一個週日早晨收拾了一個包\n趁他還在睡著的時候就走了出去。\n她說她不知道自己最後是怎麼做到的。"},
       {date:"2024年冬天", title:"之後", text:"她傳訊息告訴你她還好。\n她的語氣很平，像是在報告天氣。\n你認為她是認真的。"},
     ],
     lastOnline:null,
@@ -210,8 +210,8 @@ const FATES = [
     title:"她離開了。最後。",
     avatarFade:false,
     entries:[
-      {date:"2024年秋天", title:"事件", text:"一次吵架中，Marcus 摔了一個杯子。\n沒有打到她。\n他離開房間後，她在廚房站了很久。"},
-      {date:"2025年初", title:"之後", text:"Hannah 在將近兩年後離開了這段關係。\n她說她花了很長的時間才接受那個杯子代表的意義。"},
+      {date:"2024年秋天", title:"事件", text:"一次吵架中，Connor 摔了一個杯子。\n沒有打到她。\n他離開房間後，她在廚房站了很久。"},
+      {date:"2025年初", title:"之後", text:"Chloe 在將近兩年後離開了這段關係。\n她說她花了很長的時間才接受那個杯子代表的意義。"},
     ],
     lastOnline:null,
     friendship:"你們的友情緊繃了一段時間。她回來了。她說了對不起。",
@@ -224,7 +224,7 @@ const FATES = [
     title:"她發現自己懷孕了",
     avatarFade:false,
     entries:[
-      {date:"2024年夏天", title:"事件", text:"Hannah Chen。31歲。陽性。\n她傳給你四個字：\n「我不知道怎麼辦。」"},
+      {date:"2024年夏天", title:"事件", text:"Chloe Chen。31歲。陽性。\n她傳給你四個字：\n「我不知道怎麼辦。」"},
       {date:"2024年秋天", title:"之後", text:"她留下來了。\n她說她需要時間想清楚。\n她再也沒有回來繼續這個話題。"},
     ],
     lastOnline:null,
@@ -238,7 +238,7 @@ const FATES = [
     title:"她請了病假",
     avatarFade:false,
     entries:[
-      {date:"2024年春天", title:"事件", text:"Hannah Chen 申請了三週的病假。\n診斷：適應障礙症。\n她的母親說她狀況不好。"},
+      {date:"2024年春天", title:"事件", text:"Chloe Chen 申請了三週的病假。\n診斷：適應障礙症。\n她的母親說她狀況不好。"},
       {date:"2024年夏天", title:"之後", text:"她在姑姑家住了兩個月。\n一天傍晚你打電話給她。\n她接了。\n她說：「我以為我撐不過去。」"},
     ],
     lastOnline:null,
@@ -253,7 +253,7 @@ const FATES = [
     title:"她去了診所",
     avatarFade:false,
     entries:[
-      {date:"2024年秋天", title:"事件", text:"Hannah Chen。31歲。婦科就診。\n她傳訊息告訴你一切都結束了。\n接著說：「你不需要問原因。」"},
+      {date:"2024年秋天", title:"事件", text:"Chloe Chen。31歲。婦科就診。\n她傳訊息告訴你一切都結束了。\n接著說：「你不需要問原因。」"},
       {date:"2024年冬天", title:"之後", text:"她說她在處理一些事情。\n她說等她準備好了會告訴你。\n她還沒有準備好。"},
     ],
     lastOnline:null,
@@ -267,10 +267,10 @@ const FATES = [
     title:"她不再回應了",
     avatarFade:true,
     entries:[
-      {date:"2024年3月", title:"最後一則訊息", text:"Hannah 傳了最後一則訊息：\n「我沒事。不要找我。」\n此後無記錄。"},
+      {date:"2024年3月", title:"最後一則訊息", text:"Chloe 傳了最後一則訊息：\n「我沒事。不要找我。」\n此後無記錄。"},
       {date:"2024年4月", title:"——", text:null, void:true},
     ],
-    lastOnline:"Hannah Chen   最後上線：2024年3月14日",
+    lastOnline:"Chloe Chen   最後上線：2024年3月14日",
     friendship:"你打了很多次電話。沒有人接。",
     innerVoice:"你不知道她在哪裡。\n你不知道她還好嗎。\n你每隔幾週還是會傳一則訊息。\n只有三個字：我在這裡。",
   },
@@ -282,10 +282,10 @@ const FATES = [
     title:"——",
     avatarFade:true,
     entries:[
-      {date:"2024年4月", title:"事件", text:"Hannah Chen。31歲。\n死亡日期：2024年4月3日。\n死亡原因：未確定。\n\n她的母親在整理 Hannah 的手機時\n找到了你們的對話。"},
+      {date:"2024年4月", title:"事件", text:"Chloe Chen。31歲。\n死亡日期：2024年4月3日。\n死亡原因：未確定。\n\n她的母親在整理 Chloe 的手機時\n找到了你們的對話。"},
       {date:"2024年4月", title:"——", text:null, void:true},
     ],
-    lastOnline:"Hannah Chen   最後上線：2024年4月2日 23:51",
+    lastOnline:"Chloe Chen   最後上線：2024年4月2日 23:51",
     friendship:"你去了告別式。你沒有哭。你還沒有完全相信這件事。",
     innerVoice:"你一直在想她傳給你的那則訊息。\n凌晨一點十八分的那則。\n「我已經分不清了。」\n\n你記得你回了什麼。\n你記得你回了什麼嗎。",
   },

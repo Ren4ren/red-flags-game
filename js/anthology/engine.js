@@ -241,7 +241,7 @@ function scrollMsgs() {
   msgs.scrollTop = msgs.scrollHeight;
 }
 
-// 逐則播放（沿用 Hannah 的節奏邏輯：打字時間與閱讀時間依字數）
+// 逐則播放（沿用 Chloe 的節奏邏輯：打字時間與閱讀時間依字數）
 function playMessages(list, startDelay, onDone, fast) {
   const msgs = document.getElementById('messages');
   let delay = startDelay;

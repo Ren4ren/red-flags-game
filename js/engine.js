@@ -17,7 +17,7 @@ let chosen = {};
 let currentFate = null;
 
 // ── SAVE / LOAD ──
-const SAVE_KEY = 'rfd_hannah_save';
+const SAVE_KEY = 'rfd_chloe_save';
 
 function saveState() {
   localStorage.setItem(SAVE_KEY, JSON.stringify({ SA, current, chosen }));
@@ -225,13 +225,13 @@ function showEpilogue() {
     ep.appendChild(caseBlock);
   }
 
-  // CK3 journal — Hannah's fate
+  // CK3 journal — Chloe's fate
   const log = document.createElement('div'); log.className = 'ck-log';
   const logHeader = document.createElement('div'); logHeader.className = 'ck-log-header';
   const isDeadEnding = currentFate.id === 'dead';
   logHeader.innerHTML = isDeadEnding
     ? `<span class="ck-log-subject" style="color:var(--accent)">她記住了。</span><span class="ck-log-date"></span>`
-    : `<span class="ck-log-subject">Hannah Chen — 事件記錄</span><span class="ck-log-date">關係開始：2023年3月</span>`;
+    : `<span class="ck-log-subject">Chloe Chen — 事件記錄</span><span class="ck-log-date">關係開始：2023年3月</span>`;
   log.appendChild(logHeader);
 
   currentFate.entries.forEach((entry, i) => {
@@ -353,7 +353,7 @@ function renderEvent(idx) {
   dl.textContent = ev.date; msgs.appendChild(dl);
 
   const grp = document.createElement('div'); grp.className = 'msg-group';
-  const sl = document.createElement('div'); sl.className = 'msg-sender her'; sl.textContent = 'Hannah Chen'; grp.appendChild(sl);
+  const sl = document.createElement('div'); sl.className = 'msg-sender her'; sl.textContent = 'Chloe Chen'; grp.appendChild(sl);
   const rows = document.createElement('div'); rows.className = 'bubble-row';
   grp.appendChild(rows); msgs.appendChild(grp);
 
@@ -493,7 +493,7 @@ function showResponse(idx, opt) {
   yr.appendChild(yb); youGrp.appendChild(yr); msgs.appendChild(youGrp);
   if (responses?.length) {
     const rGrp=document.createElement('div'); rGrp.className='msg-group';
-    const rl=document.createElement('div'); rl.className='msg-sender her'; rl.textContent='Hannah Chen'; rGrp.appendChild(rl);
+    const rl=document.createElement('div'); rl.className='msg-sender her'; rl.textContent='Chloe Chen'; rGrp.appendChild(rl);
     const rr=document.createElement('div'); rr.className='bubble-row';
     responses.forEach(r => {
       const rb=document.createElement('div'); rb.className='bubble her'; rb.textContent=r.text;
