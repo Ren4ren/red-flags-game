@@ -61,6 +61,44 @@ const DICE = {
   },
 };
 
+// ── 壓力系統（Slice 3）：違背自己 → 累積 → 爆發 ──
+// 壓力看得見（模式 A 一致；藏起來會讓爆發顯得莫名其妙）。三個動詞的第三個：代價。
+const STRESS_SWALLOW = 22;        // 想抗拒卻吞回去（擲骰失敗）
+const STRESS_COMPLY  = 12;        // 主動選妥協、退讓
+const DRIFT_AFTER_BREAKDOWN = 8;  // 爆發後內在資源往下漂 → 之後更說不出口
+function breakdownThreshold(char) { return char.resources.韌性 + 30; } // 韌性越高、門檻越高、越撐得住
+
+// 自責螺旋爆發：發生在「她」身上、非玩家選；Julian 把崩潰反過來當武器（煤氣燈）。
+const BREAKDOWN = {
+  messages: [
+    { note: '凌晨三點。妳一個人，盯著天花板。' },
+    { inner: '（是不是……真的是我想太多。\n是不是我太敏感、太難搞。\n他對我那麼好——會不會，錯的一直是我。）' },
+    { him: '看吧，妳又這樣了。', time: '凌晨3:14' },
+    { him: '全世界只剩我受得了妳。妳還要把我推開？', time: '凌晨3:15' },
+  ],
+};
+
+// 離開時的糾纏：依「獵物價值」分級。鐵律：只加重情緒成本，不擲骰、不阻擋——按住就是走得了。
+const CLINGING = {
+  high: [ // 肥羊：他死纏不放
+    { him: '別這樣。妳知道我們之間這種東西，妳這輩子再也找不到第二個。', time: '凌晨' },
+    { him: '是不是有人跟妳說了什麼？妳告訴我是誰。', time: '凌晨' },
+    { him: '妳會後悔的。沒有人會像我這樣懂妳。', time: '凌晨' },
+    { note: '訊息一封接一封。哄、威脅、再哄。\n他不放手——像妳這樣的，他捨不得。' },
+  ],
+  mid: [
+    { him: '妳會後悔。', time: '凌晨' },
+    { him: '走著瞧。', time: '凌晨' },
+    { note: '然後，就沒有然後了。' },
+  ],
+  low: [ // 用完即丟 ＋ 惱羞成怒
+    { him: '呵。', time: '凌晨' },
+    { him: '說真的，我也膩了。是我不想要了——別把自己看得太重要。', time: '凌晨' },
+    { note: '連走，他都要說成是他先走的。\n他轉身去找下一個，快得像妳從沒存在過。' },
+  ],
+};
+const CLING_ENDS = new Set(['leave3', 'refused', 'surrender']); // 當面拒絕／封鎖他的結局才有糾纏
+
 // ── 試點進行中狀態 ──
 let chosen = null;          // 選定的玩家角色
 let startInsight = 0;       // 本輪由觀察力決定的起始識人之眼
@@ -72,6 +110,10 @@ let currentChoices = null;
 let liveInsight = 0;        // 進行中的識人之眼（從 startInsight 起跳，抓到線索會升）
 let spoke = { tries: 0, wins: 0 }; // 本輪「說出口」擲骰統計（結局點題用）
 let diceIv = null;          // 擲骰動畫的 interval
+let stress = 0;             // 壓力（違背自己累積）
+let stressMax = 100;        // 爆發門檻（由韌性決定）
+let brokeDown = false;      // 本輪是否已爆發
+let breakdownPending = false; // 壓力過線、待下一拍演出爆發
 
 function hasTrait(id) { return traits.includes(id); }
 function addTrait(id) { if (id && !hasTrait(id)) traits.push(id); }
@@ -139,11 +181,15 @@ function renderCharSelect() {
 }
 
 function selectCharacter(id) {
-  chosen = PILOT_CHARACTERS[id];
+  chosen = JSON.parse(JSON.stringify(PILOT_CHARACTERS[id])); // 深拷貝：爆發會改數值，不污染母資料
   startInsight = observationToInsight(chosen.resources.觀察力);
   liveInsight = startInsight;
   traits = [];
   spoke = { tries: 0, wins: 0 };
+  stress = chosen.resources.壓力;
+  stressMax = breakdownThreshold(chosen);
+  brokeDown = false;
+  breakdownPending = false;
   startEpisode();
 }
 
@@ -165,6 +211,7 @@ function startEpisode() {
   const tier = insightTier(startInsight);
   document.getElementById('pilotRole').innerHTML =
     `你扮演 <b>${chosen.archetype}</b> · 識人之眼 <b class="${tier.cls}">${tier.name}</b> · 說出口 SA <b>${computeSA()}</b>`;
+  updateStressBar();
   show('chat');
   renderBeat();
 }
@@ -234,6 +281,42 @@ function breakHimGroup(container) {
 function scrollMsgs() {
   const msgs = document.getElementById('messages');
   msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ── 壓力（看得見的條）──
+function updateStressBar() {
+  const fill = document.getElementById('stressFill');
+  const num = document.getElementById('stressNum');
+  if (!fill) return;
+  const pct = Math.min(100, Math.round(stress / stressMax * 100));
+  fill.style.width = pct + '%';
+  fill.classList.toggle('high', stress >= stressMax * 0.75);
+  num.textContent = `${stress} / ${stressMax}`;
+}
+
+function addStress(n) {
+  stress += n;
+  if (!brokeDown && stress >= stressMax) breakdownPending = true; // 過線：下一拍演出爆發
+  updateStressBar();
+  renderDebugPanel();
+}
+
+// 爆發效果：留下「自責」傷痕、內在資源往下漂（之後更說不出口）
+function applyBreakdownEffects() {
+  brokeDown = true;
+  breakdownPending = false;
+  addTrait('selfdoubt');
+  chosen.resources.自信 = Math.max(0, chosen.resources.自信 - DRIFT_AFTER_BREAKDOWN);
+  chosen.resources.邊界感 = Math.max(0, chosen.resources.邊界感 - DRIFT_AFTER_BREAKDOWN);
+  updateStressBar();
+  renderDebugPanel();
+}
+
+// 糾纏：離開時依獵物價值分級（純演出、不阻擋）
+function playClinging(onDone) {
+  const set = CLINGING[preyTier(chosen)] || CLINGING.mid;
+  breakHimGroup(document.getElementById('messages'));
+  playMessages(set, 600, onDone, true);
 }
 
 // 逐則播放（沿用選集的節奏邏輯：打字時間與閱讀時間依字數）
@@ -306,9 +389,14 @@ function renderBeat() {
   document.getElementById('choicesArea').style.display = 'none';
   renderDebugPanel(); // 測試面板開著的話，刷新即時數值
 
-  playMessages(beat.messages, 400, () => {
-    showChoices(beat.choices);
-  }, false);
+  if (breakdownPending) { // 壓力過線：先演自責螺旋爆發，再進本拍
+    playMessages(BREAKDOWN.messages, 400, () => {
+      applyBreakdownEffects();
+      playMessages(beat.messages, 700, () => showChoices(beat.choices), false);
+    }, false);
+  } else {
+    playMessages(beat.messages, 400, () => showChoices(beat.choices), false);
+  }
 }
 
 function showChoices(choices) {
@@ -371,6 +459,7 @@ function resolveExpressive(c, dice) {
       if (c.reply && c.reply.length) playMessages(c.reply, 500, cont, true);
       else schedule(cont, 400);
     } else {
+      addStress(STRESS_SWALLOW); // 想抗拒卻吞回去 → 壓力累積
       const bubble = appendYouBubble(c.text); // 話打出來……
       scrollMsgs();
       const d1 = DEBUG.instant ? 10 : 500, d2 = DEBUG.instant ? 10 : 950;
@@ -443,6 +532,10 @@ function choose(i) {
 
   if (dice) { resolveExpressive(c, dice); return; } // 抵抗型 → 擲骰
 
+  // 這一拍本來有「抵抗」選項，妳卻選了妥協退讓 → 也是違背自己，累積壓力
+  const beatHadResist = currentChoices.some(x => x.flag && DICE[x.flag]);
+  if (beatHadResist && !c.end && !c.followup && !c.flag) addStress(STRESS_COMPLY);
+
   if (c.flag) { flags.add(c.flag); liveInsight = Math.min(liveInsight + 1, 8); } // 抓到線索，眼睛更利一點
 
   // 玩家的動作：括號開頭＝行動敘述，否則是訊息泡泡
@@ -453,24 +546,32 @@ function choose(i) {
   }
   scrollMsgs();
 
+  const armEnd = () => {
+    pendingEnd = c.end;
+    const nextBtn = document.getElementById('nextBtn');
+    nextBtn.textContent = '看下去 →';
+    nextBtn.disabled = false;
+  };
+
   const after = () => {
     if (c.followup) {
       playMessages(c.followup.reply || [], 500, () => showChoices(c.followup.choices), true);
       return;
     }
     if (c.end) {
-      pendingEnd = c.end;
-      const nextBtn = document.getElementById('nextBtn');
-      nextBtn.textContent = '看下去 →';
-      nextBtn.disabled = false;
+      // 當面拒絕／封鎖他：改用依獵物價值分級的糾纏（富＝死纏、媽＝用完即丟）
+      if (CLING_ENDS.has(c.end)) playClinging(armEnd);
+      else armEnd();
       return;
     }
-    const nextBtn = document.getElementById('nextBtn');
-    nextBtn.disabled = false;
+    document.getElementById('nextBtn').disabled = false;
     scrollMsgs();
   };
 
-  if (c.reply && c.reply.length) {
+  // 糾纏結局：跳過原本通用回覆，改演分級糾纏；其餘照舊播放選項回覆
+  if (c.end && CLING_ENDS.has(c.end)) {
+    schedule(after, 300);
+  } else if (c.reply && c.reply.length) {
     playMessages(c.reply, 500, after, true);
   } else {
     schedule(after, 400);
@@ -615,6 +716,8 @@ function toggleDebug() {
 function dbgInstant(on) { DEBUG.instant = on; renderDebugPanel(); }
 function dbgForce(mode) { DEBUG.force = mode; renderDebugPanel(); }
 function dbgChar(id) { selectCharacter(id); renderDebugPanel(); }
+function dbgStress() { if (chosen) addStress(STRESS_SWALLOW); }
+function dbgBreak() { if (chosen) { stress = stressMax; addStress(0); renderDebugPanel(); } } // 過線 → 下一拍/跳拍時爆發
 function dbgJump(n) {
   if (!chosen) selectCharacter('everywoman');
   clearRenderTimers();
@@ -644,14 +747,25 @@ function renderDebugPanel() {
       <button class="dbg-chip" onclick="dbgChar('singlemom')">單親媽媽</button>
     </div></div>
     <div class="dbg-sect">➡ 跳到第幾拍<div class="dbg-row">${beatBtns}</div></div>
+    <div class="dbg-sect">💥 壓力<div class="dbg-row">
+      <button class="dbg-chip" onclick="dbgStress()">+22 壓力</button>
+      <button class="dbg-chip" onclick="dbgBreak()">逼到爆發</button>
+    </div></div>
     <div class="dbg-sect">🔍 隱藏數值（即時）<div class="dbg-state">
       角色：${who}<br>
       SA（說出口）：${sa}　勝算：${odds}<br>
       識人之眼：${tier}（值 ${liveInsight}）<br>
+      壓力：${chosen ? stress + ' / ' + stressMax + (brokeDown ? '（已爆發）' : (breakdownPending ? '（下一拍爆發）' : '')) : '—'}<br>
+      獵物價值：${chosen ? preyValue(chosen) + '（他多想纏：' + preyTier(chosen) + '）' : '—'}<br>
       已戳破：${[...flags].join('、') || '（無）'}<br>
       說出口：${spoke.tries ? spoke.wins + ' / ' + spoke.tries : '—'}
     </div></div>`;
 }
 
 // ── INIT ──
+// 測試按鈕只在網址帶 ?debug（如 ?debug=1）時出現——朋友試玩看不到，作者自己測才加。
+(function () {
+  const t = document.getElementById('dbgToggle');
+  if (t && !/[?&]debug/.test(location.search)) t.style.display = 'none';
+})();
 // 等待玩家點標題進入選角

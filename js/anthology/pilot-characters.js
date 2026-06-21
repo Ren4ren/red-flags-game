@@ -12,11 +12,13 @@ const PILOT_CHARACTERS = {
     tagline: '什麼都有，唯獨看不穿。',
     blurb: '她走得掉，問題是她不覺得需要走。最諷刺的紅旗，是她自己的天真。',
     resources: {
-      觀察力: 35,  // ← 本輪唯一真正驅動「看見」的數值（最低：最看不出紅旗）
+      觀察力: 35,  // ← 驅動「看見」（最低：最看不出紅旗）
       自信: 40,
       邊界感: 26,
       韌性: 60,
       壓力: 8,
+      金錢: 90,   // → 獵物價值高 = 他最捨不得放手（肥羊）
+      美貌: 55,
     },
     leaveCost: '低',
   },
@@ -33,6 +35,8 @@ const PILOT_CHARACTERS = {
       邊界感: 31,
       韌性: 50,
       壓力: 10,
+      金錢: 50,
+      美貌: 50,
     },
     leaveCost: '中',
   },
@@ -49,6 +53,8 @@ const PILOT_CHARACTERS = {
       邊界感: 30,
       韌性: 35,
       壓力: 22,
+      金錢: 15,   // → 獵物價值低 = 他用完即丟、惱羞成怒甩她
+      美貌: 50,
     },
     leaveCost: '高',
   },
@@ -63,4 +69,17 @@ function observationToInsight(obs) {
   if (obs >= 50) return 3; // 識人：看得到大部分
   if (obs >= 40) return 2; // 留心＋
   return 1;                // 留心：勉強比天真多看一眼，會錯過比較利的戳破選項
+}
+
+// 獵物價值：掠食者多想留住妳 = f(金錢, 美貌)。錢佔大頭、美貌加成（可調）。
+// 設計鉤子：美貌沒配抵抗屬性 = 招來更兇的蒼蠅（未來玩家配點時，加爆美貌＝把自己變磁鐵）。
+function preyValue(char) {
+  const r = char.resources;
+  return Math.round((r.金錢 || 0) * 0.7 + (r.美貌 || 0) * 0.3);
+}
+function preyTier(char) {
+  const v = preyValue(char);
+  if (v >= 60) return 'high'; // 死纏不放
+  if (v >= 38) return 'mid';
+  return 'low';               // 用完即丟
 }

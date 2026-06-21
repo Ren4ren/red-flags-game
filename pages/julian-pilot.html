@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Red Flags — 主線試點：資源＝選擇權</title>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/anthology.css">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/anthology.css">
 <style>
   /* ── 試點專屬元件（內聯，不動共用 CSS）── */
 
@@ -75,6 +75,17 @@
   }
   .pilot-rolebar b { color: var(--text); }
   .pilot-rolebar b.good { color: #8fd0a8; }
+
+  /* 壓力條（看得見：模式 A 一致） */
+  .pilot-stress {
+    display: flex; align-items: center; gap: 8px; padding: 5px 14px 8px;
+    background: rgba(255,255,255,.03); border-bottom: 1px solid rgba(255,255,255,.06);
+  }
+  .stress-label { font-size: .7rem; color: var(--text-dim); letter-spacing: .05em; flex: 0 0 auto; }
+  .stress-track { flex: 1; height: 6px; background: rgba(255,255,255,.08); border-radius: 4px; overflow: hidden; }
+  .stress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #c98a4a, #d0a85a); border-radius: 4px; transition: width .4s ease; }
+  .stress-fill.high { background: linear-gradient(90deg, #c14a4a, #e07a5a); }
+  .stress-num { font-family: 'Space Mono', monospace; font-size: .7rem; color: var(--text-dim); flex: 0 0 auto; }
 
   /* 抵抗型選項：標出勝算（事前透明） */
   .choice-btn.resist { display: flex; flex-direction: column; align-items: center; gap: 5px; }
@@ -177,6 +188,11 @@
       <button class="peek-btn" onclick="confirmExit()">放下手機</button>
     </div>
     <div class="pilot-rolebar" id="pilotRole"></div>
+    <div class="pilot-stress" id="stressWrap">
+      <span class="stress-label">壓力</span>
+      <div class="stress-track"><div class="stress-fill" id="stressFill"></div></div>
+      <span class="stress-num" id="stressNum"></span>
+    </div>
     <div class="messages" id="messages"></div>
     <div class="choices" id="choicesArea" style="display:none">
       <div class="choices-label">妳的回應</div>
@@ -196,8 +212,8 @@
 <button id="dbgToggle" onclick="toggleDebug()">🛠 測試</button>
 <div id="dbgPanel"></div>
 
-<script src="js/anthology/julian.js"></script>
-<script src="js/anthology/pilot-characters.js"></script>
-<script src="js/anthology/pilot-engine.js"></script>
+<script src="../js/anthology/julian.js"></script>
+<script src="../js/anthology/pilot-characters.js"></script>
+<script src="../js/anthology/pilot-engine.js"></script>
 </body>
 </html>
