@@ -42,6 +42,8 @@
     background:var(--red); opacity:.75; transition:opacity .25s ease;
   }
   .entry.chloe::before{ background:var(--purple); }
+  .entry.pilot::before{ background:#5a8c7a; }
+  .entry.pilot{ grid-column:1 / -1; }
   .entry:hover{ transform:translateY(-4px); border-color:#3a3646; box-shadow:0 14px 40px rgba(0,0,0,.45); }
   .entry:hover::before{ opacity:1; }
 
@@ -65,17 +67,24 @@
     <div class="tagline">有些人是來戀愛的。有些人是來上班的。有些人是來收割的。</div>
 
     <div class="cards">
-      <a class="entry" href="anthology.html">
+      <a class="entry" href="pages/anthology.html">
         <div class="tag">主線 · 開發中</div>
         <div class="title">諷刺選集</div>
         <div class="desc">第一人稱滑卡約會。配對池裡有掠食者，也有正常人——自己分辨，自己決定要不要走。</div>
         <div class="go">進入 →</div>
       </a>
 
-      <a class="entry chloe" href="chloe.html">
+      <a class="entry chloe" href="pages/chloe.html">
         <div class="tag">實驗分支 · 已收尾</div>
         <div class="title">Chloe 篇</div>
         <div class="desc">旁觀者視角。你看著朋友一步步走進一段關係，全程零回饋，結局才揭曉發生了什麼。</div>
+        <div class="go">進入 →</div>
+      </a>
+
+      <a class="entry pilot" href="pages/julian-pilot.html">
+        <div class="tag">🛠 主線試點 · 開發測試用</div>
+        <div class="title">資源＝選擇權（Julian 試點）</div>
+        <div class="desc">機制實驗：選一個角色（富家女／普通／單親媽媽），同一個 Julian，看得到的、說得出口的都不一樣。右下角有測試模式。</div>
         <div class="go">進入 →</div>
       </a>
     </div>

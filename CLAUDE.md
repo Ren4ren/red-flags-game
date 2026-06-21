@@ -53,17 +53,25 @@
 - **主線＝諷刺選集**——第一人稱滑卡約會，配對池裡有人類掠食者原型也有正常人，玩家自己分辨。**開發中。**
 - **Chloe 篇＝旁觀者零回饋實驗，已收尾、定為分支**，現階段不主動開發。
 
+**目錄結構（2026-06-21 整理）：根目錄只留一個 `index.html`，其餘頁面收進 `pages/`。**
+子頁的 css/js 路徑都用 `../`（如 `../css/style.css`、`../js/engine.js`）。
+
+**入口：**
+- `index.html` — **根目錄唯一的 HTML**，入口選單頁（連到選集／Chloe／主線試點三個入口）
+
 **主要檔案 — 諷刺選集（主線）：**
-- `anthology.html` — 選集入口頁
+- `pages/anthology.html` — 選集入口頁
 - `css/anthology.css` — 選集樣式（疊在 `css/style.css` 上）
 - `js/anthology/engine.js` — 選集引擎（池子即選單、傷痕特質、識人之眼）
 - `js/anthology/sebastian.js`、`daniel.js`、`julian.js` — 各篇內容（EP1 愛情騙子、EP2 正常人、EP3 自戀型）
 
-**入口：**
-- `index.html` — 入口選單頁（選集／Chloe 兩個入口；2026-06-17 新增）
+**主線試點（開發中，Julian retrofit 主線系統；2026-06-21 commit f35c339）：**
+- `pages/julian-pilot.html` — 試點入口（選角＋觀察力＝看見＋對話執行擲骰＋測試模式）
+- `js/anthology/pilot-engine.js`、`js/anthology/pilot-characters.js` — 試點引擎與三個玩家角色起始資源
+- 刻意獨立，不動選集本體；驗證完才決定是否併進主線
 
 **主要檔案 — Chloe 篇（分支）：**
-- `chloe.html` — Chloe 主頁面（原 index.html，2026-06-17 改名）
+- `pages/chloe.html` — Chloe 主頁面（原 index.html，2026-06-17 改名）
 - `css/style.css` — 共用視覺樣式
 - `js/engine.js` — Chloe 引擎（SA 系統、結局、渲染）
 - `js/stories/chloe.js` — Chloe 故事內容

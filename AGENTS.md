@@ -49,9 +49,11 @@
 這是一個互動故事遊戲，網頁形式（HTML + CSS + JS）。
 作者是動畫師，不是程式設計師，請以非技術性語言溝通。
 
-**主要檔案：**
-- `index.html` — 入口選單頁（選集／Chloe）
-- `chloe.html` — Chloe 篇主頁面（原 index.html）
+**主要檔案：**（2026-06-21 整理：根目錄只留 `index.html`，其餘頁面收進 `pages/`，子頁 css/js 路徑用 `../`）
+- `index.html` — 根目錄唯一 HTML，入口選單頁（連到選集／Chloe／主線試點）
+- `pages/anthology.html` — 諷刺選集（主線）入口
+- `pages/chloe.html` — Chloe 篇主頁面（原 index.html）
+- `pages/julian-pilot.html` — 主線試點（開發中；引擎在 `js/anthology/pilot-engine.js`、角色在 `pilot-characters.js`）
 - `css/style.css` — 視覺樣式
 - `js/engine.js` — 遊戲引擎邏輯（SA 系統、結局、渲染）
 - `js/stories/chloe.js` — Chloe 的故事內容（對話、選項、結局）
