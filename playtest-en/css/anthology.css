@@ -1,0 +1,137 @@
+/* ── 諷刺選集專用樣式（疊在 style.css 之上） ── */
+
+.anth-body { display:flex; }
+.anth-main { max-width:760px; margin:0 auto; width:100%; border-left:1px solid var(--border); border-right:1px solid var(--border); }
+
+/* 池子 */
+.pool { flex:1; overflow-y:auto; padding:36px 28px; display:none; flex-direction:column; scrollbar-width:thin; scrollbar-color:var(--border) transparent; }
+.pool.visible { display:flex; }
+.pool-header { text-align:center; margin-bottom:28px; }
+.pool-title { font-family:var(--font-mono); font-size:12px; letter-spacing:0.25em; color:var(--text-dim); text-transform:uppercase; }
+.pool-sub { font-family:var(--font-mono); font-size:10px; color:var(--text-dimmer); margin-top:8px; letter-spacing:0.08em; }
+
+.pool-cards { display:flex; flex-direction:column; gap:16px; }
+.pool-card {
+  background:var(--surface); border:1px solid var(--border); border-radius:10px;
+  padding:20px 22px; cursor:pointer; transition:all 0.15s; position:relative;
+  animation:fadeUp 0.4s ease both;
+}
+.pool-card:hover { border-color:var(--text-dimmer); background:var(--surface2); }
+.pool-card.is-player { cursor:default; border-style:dashed; }
+.pool-card.is-player:hover { background:var(--surface); border-color:var(--border); }
+.pool-card.done { opacity:0.75; }
+.pool-card-top { display:flex; align-items:center; gap:14px; }
+.pool-avatar {
+  width:44px; height:44px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:600;
+}
+.pool-card-name { font-size:16px; font-weight:600; }
+.pool-card-sub { font-family:var(--font-mono); font-size:10px; color:var(--text-dim); margin-top:3px; }
+.pool-card-quote { font-size:14px; font-style:italic; color:var(--text-dim); line-height:1.7; margin-top:14px; }
+.pool-card-state { font-family:var(--font-mono); font-size:10px; color:var(--text-dimmer); margin-top:12px; letter-spacing:0.06em; }
+.pool-card-state .done-tag { color:var(--green); }
+.pool-card-state .skip-tag { color:var(--text-dimmer); }
+
+/* 玩家卡上的特質 */
+.trait-row { display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; }
+.trait-chip {
+  font-family:var(--font-mono); font-size:10px; padding:4px 10px;
+  border:1px solid var(--border); border-radius:20px; color:var(--text-dim);
+}
+.trait-chip.scar { border-color:var(--accent); color:var(--accent); opacity:0.85; }
+.trait-chip.good { border-color:var(--green); color:var(--green); opacity:0.9; }
+.trait-chip.edge { border-color:var(--warning); color:var(--warning); opacity:0.9; }
+.trait-empty { font-family:var(--font-mono); font-size:10px; color:var(--text-dimmer); font-style:italic; margin-top:12px; }
+
+.pool-foot { text-align:center; font-family:var(--font-mono); font-size:10px; color:var(--text-dimmer); margin-top:32px; line-height:2; letter-spacing:0.06em; }
+
+/* 個人檔案頁 */
+.profile-view { flex:1; overflow-y:auto; padding:36px 32px; display:none; flex-direction:column; scrollbar-width:thin; }
+.profile-view.visible { display:flex; animation:fadeIn 0.3s ease both; }
+.profile-top { display:flex; align-items:center; gap:18px; margin-bottom:22px; }
+.profile-avatar { width:64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:600; flex-shrink:0; }
+.profile-name { font-size:22px; font-weight:600; }
+.profile-sub { font-family:var(--font-mono); font-size:11px; color:var(--text-dim); margin-top:4px; }
+.profile-quote { font-size:16px; font-style:italic; color:var(--text); line-height:1.9; padding:16px 20px; background:var(--surface); border-left:2px solid var(--border); margin-bottom:22px; white-space:pre-line; }
+.profile-photos { margin-bottom:22px; }
+.profile-block-label { font-family:var(--font-mono); font-size:9px; letter-spacing:0.2em; color:var(--text-dimmer); text-transform:uppercase; margin-bottom:10px; }
+.profile-photo-item {
+  font-size:14px; color:var(--text-dim); padding:10px 14px; line-height:1.7;
+  background:var(--surface); border:1px solid var(--border); border-radius:8px; margin-bottom:8px;
+}
+.profile-bio { font-size:15px; color:var(--text); line-height:1.9; margin-bottom:28px; white-space:pre-line; }
+.profile-actions { display:flex; gap:10px; margin-top:auto; padding-top:20px; }
+.profile-btn {
+  flex:1; font-family:var(--font-mono); font-size:12px; letter-spacing:0.1em;
+  padding:14px; border-radius:8px; cursor:pointer; transition:all 0.15s;
+  background:none; border:1px solid var(--border); color:var(--text-dim);
+}
+.profile-btn:hover { color:var(--text); border-color:var(--text-dim); }
+.profile-btn.match { border-color:var(--green); color:var(--green); }
+.profile-btn.match:hover { background:var(--green-soft); }
+.profile-btn.back { flex:0 0 auto; padding:14px 18px; }
+
+/* 聊天 */
+.chat-wrap { flex:1; display:none; flex-direction:column; overflow:hidden; }
+.chat-wrap.visible { display:flex; }
+.msg-sender.him { color:#c4a35a; }
+
+/* 內心獨白 */
+.inner-voice {
+  align-self:flex-end; max-width:78%; margin:6px 0 14px;
+  font-size:13px; font-style:italic; color:var(--text-dim); line-height:1.8;
+  padding:8px 14px; border-right:2px solid var(--border); text-align:right;
+  white-space:pre-line; animation:fadeUp 0.35s ease both;
+}
+
+/* 場景敘述 */
+.scene-note {
+  text-align:center; font-family:var(--font-mono); font-size:11px; color:var(--text-dimmer);
+  line-height:1.9; margin:14px auto; max-width:86%; white-space:pre-line;
+  animation:fadeUp 0.35s ease both;
+}
+
+/* 結局頁 */
+.anth-ep { padding:40px 36px; }
+.anth-ep.visible { display:flex; }
+.ending-kicker { font-family:var(--font-mono); font-size:10px; letter-spacing:0.25em; color:var(--text-dimmer); text-transform:uppercase; margin-bottom:10px; }
+.ending-title { font-size:24px; font-weight:600; line-height:1.5; margin-bottom:32px; }
+
+.dodge-block { margin-bottom:40px; padding:22px 26px; border:1px solid var(--border); border-radius:8px; background:var(--surface); position:relative; overflow:hidden; }
+.dodge-block::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--green),transparent); }
+.dodge-label { font-family:var(--font-mono); font-size:10px; letter-spacing:0.2em; color:var(--green); text-transform:uppercase; margin-bottom:14px; }
+.dodge-text { font-size:15px; color:var(--text); line-height:2; white-space:pre-line; }
+
+.anatomy-block { margin-bottom:40px; }
+.anatomy-row { display:flex; gap:18px; padding:14px 0; border-bottom:1px solid var(--border); animation:fadeUp 0.4s ease both; }
+.anatomy-step { font-family:var(--font-mono); font-size:10px; color:var(--accent); min-width:96px; flex-shrink:0; padding-top:3px; letter-spacing:0.04em; }
+.anatomy-text { font-size:14px; color:var(--text); line-height:1.8; flex:1; }
+
+.flagcheck-block { margin-bottom:40px; }
+.flagcheck-row { display:flex; gap:14px; padding:12px 0; border-bottom:1px solid var(--border); align-items:baseline; animation:fadeUp 0.4s ease both; }
+.flagcheck-mark { font-family:var(--font-mono); font-size:12px; min-width:56px; flex-shrink:0; }
+.flagcheck-mark.hit { color:var(--green); }
+.flagcheck-mark.miss { color:var(--text-dimmer); }
+.flagcheck-text { font-size:14px; color:var(--text-dim); line-height:1.7; flex:1; }
+.flagcheck-text .answer { color:var(--text); }
+
+.trait-award { margin-bottom:40px; padding:22px 26px; border:1px solid var(--border); border-radius:8px; background:var(--surface); }
+.trait-award-label { font-family:var(--font-mono); font-size:10px; letter-spacing:0.2em; color:var(--text-dimmer); text-transform:uppercase; margin-bottom:12px; }
+.trait-award-name { font-size:18px; font-weight:600; margin-bottom:8px; }
+.trait-award-name.scar { color:var(--accent); }
+.trait-award-name.good { color:var(--green); }
+.trait-award-name.edge { color:var(--warning); }
+.trait-award-desc { font-size:14px; color:var(--text-dim); line-height:1.9; white-space:pre-line; }
+
+.wink-block { margin-bottom:40px; padding:20px 24px; border-left:2px solid var(--warning); }
+.wink-text { font-size:15px; color:var(--text); line-height:2; font-style:italic; white-space:pre-line; }
+
+/* 手機 */
+@media (max-width:680px) {
+  .anth-main { border:none; }
+  .pool { padding:24px 16px; }
+  .profile-view { padding:24px 18px; }
+  .anth-ep { padding:24px 18px; }
+  .ending-title { font-size:20px; }
+  .anatomy-step { min-width:80px; }
+}

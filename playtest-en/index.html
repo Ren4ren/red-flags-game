@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Red Flags — A Satirical Anthology</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/anthology.css">
+<style>
+  /* ── Resource-system components (merged in from the Julian pilot) ── */
+
+  /* Character select */
+  #charSelect { display: none; }
+  #charSelect.visible {
+    display: flex; flex-direction: column; flex: 1;
+    overflow-y: auto; padding: 0 20px 48px;
+    scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  }
+  .charsel-head { text-align: center; margin: 28px 0 18px; }
+  .charsel-title { font-size: 1.5rem; letter-spacing: .04em; color: var(--text); }
+  .charsel-sub { margin-top: 8px; color: var(--text-dim); font-size: .92rem; line-height: 1.7; }
+  .charsel-cards { display: flex; flex-direction: column; gap: 16px; max-width: 560px; margin: 0 auto 40px; }
+
+  .charsel-card {
+    background: var(--card, #1a1622); border: 1px solid rgba(255,255,255,.08);
+    border-radius: 14px; padding: 18px 18px 16px; cursor: pointer;
+    transition: border-color .2s, transform .15s, box-shadow .2s;
+    animation: fadeUp .5s ease both;
+  }
+  .charsel-card:hover { border-color: rgba(200,120,140,.55); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,.35); }
+
+  .charsel-top { display: flex; align-items: center; gap: 14px; }
+  .charsel-avatar {
+    width: 52px; height: 52px; border-radius: 50%; flex: 0 0 auto;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; color: #fff; font-weight: 600;
+  }
+  .charsel-arch { font-size: 1.15rem; color: var(--text); letter-spacing: .03em; }
+  .charsel-tag { margin-top: 3px; color: var(--text-dim); font-size: .88rem; }
+  .charsel-blurb { margin: 12px 2px 14px; color: var(--text-dim); font-size: .86rem; line-height: 1.65; font-style: italic; }
+
+  .charsel-stats { display: flex; flex-direction: column; gap: 7px; margin: 0 2px 14px; }
+  .stat-row { display: flex; align-items: center; gap: 10px; opacity: .45; }
+  .stat-row.active { opacity: 1; }
+  .stat-label { flex: 0 0 96px; font-size: .8rem; color: var(--text-dim); }
+  .stat-row.active .stat-label { color: var(--text); }
+  .stat-tag {
+    font-size: .62rem; background: rgba(200,120,140,.22); color: #e8a8b8;
+    padding: 1px 6px; border-radius: 8px; margin-left: 4px; letter-spacing: .05em;
+  }
+  .stat-bar { flex: 1; height: 6px; background: rgba(255,255,255,.08); border-radius: 4px; overflow: hidden; }
+  .stat-fill { height: 100%; background: rgba(255,255,255,.3); border-radius: 4px; }
+  .stat-row.active .stat-fill { background: linear-gradient(90deg, #c8788c, #e8a8b8); }
+  .stat-val { flex: 0 0 26px; text-align: right; font-size: .78rem; color: var(--text-dim); font-family: 'Space Mono', monospace; }
+  .stat-row.active .stat-val { color: var(--text); }
+
+  .charsel-foot { display: flex; justify-content: space-between; margin: 0 2px 14px; font-size: .8rem; color: var(--text-dim); }
+  .charsel-eye b, .charsel-cost { letter-spacing: .03em; }
+  .charsel-eye b.good { color: #8fd0a8; }
+
+  .charsel-btn {
+    width: 100%; padding: 11px; border: 1px solid rgba(200,120,140,.4);
+    background: rgba(200,120,140,.12); color: #e8a8b8; border-radius: 10px;
+    font-size: .92rem; letter-spacing: .04em; cursor: pointer; transition: background .2s;
+    font-family: inherit;
+  }
+  .charsel-card:hover .charsel-btn { background: rgba(200,120,140,.22); }
+
+  /* Pool: live a different life (reset) */
+  .pool-reset { margin-top: 14px; text-align: center; }
+  .pool-reset-btn {
+    background: none; border: none; color: var(--text-dim); cursor: pointer;
+    font-family: inherit; font-size: .76rem; letter-spacing: .05em; opacity: .7;
+    text-decoration: underline; text-underline-offset: 3px;
+  }
+  .pool-reset-btn:hover { opacity: 1; color: var(--text); }
+
+  /* "You're playing as" role bar in chat (only on episodes with a lens) */
+  .role-bar {
+    text-align: center; padding: 7px 12px; font-size: .8rem; color: var(--text-dim);
+    background: rgba(255,255,255,.03); border-bottom: 1px solid rgba(255,255,255,.06);
+    letter-spacing: .03em;
+  }
+  .role-bar b { color: var(--text); }
+  .role-bar b.good { color: #8fd0a8; }
+
+  /* Stress bar (visible: Mode A) */
+  .stress-wrap {
+    display: flex; align-items: center; gap: 8px; padding: 5px 14px 8px;
+    background: rgba(255,255,255,.03); border-bottom: 1px solid rgba(255,255,255,.06);
+  }
+  .stress-label { font-size: .7rem; color: var(--text-dim); letter-spacing: .05em; flex: 0 0 auto; }
+  .stress-track { flex: 1; height: 6px; background: rgba(255,255,255,.08); border-radius: 4px; overflow: hidden; }
+  .stress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #c98a4a, #d0a85a); border-radius: 4px; transition: width .4s ease; }
+  .stress-fill.high { background: linear-gradient(90deg, #c14a4a, #e07a5a); }
+  .stress-num { font-family: 'Space Mono', monospace; font-size: .7rem; color: var(--text-dim); flex: 0 0 auto; }
+
+  /* Resist-type options: show the odds (transparent up front) */
+  .choice-btn.resist { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .choice-btn.resist .odds {
+    font-family: 'Space Mono', monospace; font-size: .72rem; color: #e8a8b8;
+    letter-spacing: .04em; opacity: .92;
+  }
+
+  /* Speak-up check panel */
+  .dice-panel {
+    margin: 16px auto; max-width: 80%; padding: 14px 16px; text-align: center;
+    background: rgba(200,120,140,.07); border: 1px solid rgba(200,120,140,.28);
+    border-radius: 12px; animation: fadeUp .3s ease both;
+  }
+  .dice-label { font-size: .64rem; letter-spacing: .14em; color: #e8a8b8; text-transform: uppercase; }
+  .dice-say { margin: 8px 0 12px; font-style: italic; color: var(--text); font-size: .9rem; line-height: 1.6; }
+  .dice-meter { display: flex; align-items: center; justify-content: center; gap: 18px; }
+  .dice-odds { font-family: 'Space Mono', monospace; font-size: .8rem; color: var(--text-dim); }
+  .dice-roll { font-family: 'Space Mono', monospace; font-size: 1.5rem; color: var(--text); min-width: 48px; }
+  .dice-roll.ok { color: #8fd0a8; }
+  .dice-roll.no { color: #e08a8a; }
+  .dice-result { margin-top: 10px; font-size: .82rem; letter-spacing: .05em; color: var(--text-dim); }
+  .dice-result.ok { color: #8fd0a8; }
+  .dice-result.no { color: #e08a8a; }
+
+  /* Failure: the words retract */
+  .bubble.you.retracting { animation: retract .9s ease forwards; }
+  @keyframes retract {
+    0% { opacity: 1; transform: none; }
+    55% { opacity: .85; }
+    100% { opacity: 0; transform: translateY(8px) scale(.94); filter: blur(1.5px); }
+  }
+
+  /* Stat tooltip (hover a stat-row on the character-select screen) */
+  .stat-row[data-tip] { position: relative; cursor: default; }
+  .stat-row[data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute; left: 0; bottom: calc(100% + 5px);
+    background: rgba(20,16,26,.97); border: 1px solid rgba(200,120,140,.28);
+    color: var(--text-dim); font-size: .74rem; line-height: 1.55;
+    padding: 7px 11px; border-radius: 8px; width: 218px;
+    white-space: normal; pointer-events: none; z-index: 20;
+    animation: fadeUp .15s ease both;
+  }
+
+  /* Debug mode (only appears with ?debug in the URL; friends won't see it) */
+  #dbgToggle {
+    position: fixed; bottom: 14px; right: 14px; z-index: 50;
+    background: rgba(40,30,50,.92); color: #e8a8b8; border: 1px solid rgba(200,120,140,.4);
+    border-radius: 20px; padding: 7px 13px; font-size: .8rem; cursor: pointer; font-family: inherit;
+  }
+  #dbgPanel {
+    position: fixed; bottom: 56px; right: 14px; z-index: 50; width: 256px; display: none;
+    background: rgba(20,16,26,.98); border: 1px solid rgba(200,120,140,.35); border-radius: 12px;
+    padding: 12px 14px; color: var(--text); box-shadow: 0 10px 40px rgba(0,0,0,.5);
+    max-height: 82vh; overflow-y: auto;
+  }
+  #dbgPanel.open { display: block; }
+  .dbg-title { font-size: .82rem; color: #e8a8b8; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+  .dbg-x { background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: .9rem; }
+  .dbg-sect { margin: 10px 0; color: var(--text-dim); font-size: .74rem; }
+  .dbg-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .dbg-chip {
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); color: var(--text);
+    border-radius: 8px; padding: 5px 9px; font-size: .75rem; cursor: pointer; font-family: inherit;
+  }
+  .dbg-chip.on { background: rgba(200,120,140,.25); border-color: rgba(200,120,140,.5); color: #e8a8b8; }
+  .dbg-sw { color: var(--text); margin-left: 6px; }
+  .dbg-state { margin-top: 6px; line-height: 1.85; color: var(--text); font-family: 'Space Mono', monospace; font-size: .72rem; }
+</style>
+</head>
+<body class="anth-body">
+
+<div class="title-screen" id="titleScreen" onclick="anthStart()">
+  <div class="title-accent"></div>
+  <div class="title-line t1">Red Flags — Anthology</div>
+  <div class="title-line t2">The pool has all kinds.</div>
+  <div class="title-line t3">Some are here to fall in love.<br>Some are here to go to work.<br>Good luck.</div>
+  <div class="title-line t4">Tap anywhere to begin</div>
+</div>
+
+<main class="main anth-main">
+
+  <!-- Character select (you only live once: decide what you walk in with) -->
+  <section class="char-select" id="charSelect">
+    <div class="charsel-head">
+      <div class="charsel-title">This time around — who are you?</div>
+      <div class="charsel-sub">The people in the pool treat everyone the same.<br>The difference is what you bring in — what you can see, what you can walk away from.</div>
+    </div>
+    <div class="charsel-cards" id="charCards"></div>
+  </section>
+
+  <!-- The pool (the menu is the game) -->
+  <section class="pool" id="poolScreen">
+    <div class="pool-header">
+      <div class="pool-title">Tonight’s pool</div>
+      <div class="pool-sub">Whoever you swipe to is whose story you get.</div>
+    </div>
+    <div class="pool-cards" id="poolCards"></div>
+    <div class="pool-foot" id="poolFoot"></div>
+  </section>
+
+  <!-- Profile (one last look before you swipe right) -->
+  <section class="profile-view" id="profileView"></section>
+
+  <!-- Chat (the story itself) -->
+  <section class="chat-wrap" id="chatWrap">
+    <div class="chat-header">
+      <div class="avatar" id="chatAvatar">?</div>
+      <div>
+        <div class="chat-name" id="chatName"></div>
+        <div class="chat-status" id="chatStatus"></div>
+      </div>
+      <button class="peek-btn" onclick="confirmExit()">Put the phone down</button>
+    </div>
+    <div class="role-bar" id="roleBar" style="display:none"></div>
+    <div class="stress-wrap" id="stressWrap" style="display:none">
+      <span class="stress-label">Stress</span>
+      <div class="stress-track"><div class="stress-fill" id="stressFill"></div></div>
+      <span class="stress-num" id="stressNum"></span>
+    </div>
+    <div class="messages" id="messages"></div>
+    <div class="choices" id="choicesArea" style="display:none">
+      <div class="choices-label">Your response</div>
+    </div>
+    <div class="nav-area" id="navArea">
+      <span class="nav-progress" id="navProgress"></span>
+      <button class="nav-btn" id="nextBtn" onclick="nextBeat()" disabled>Continue →</button>
+    </div>
+  </section>
+
+  <!-- Ending & recap -->
+  <section class="epilogue-screen anth-ep" id="endingScreen"></section>
+
+</main>
+
+<!-- Debug mode (only appears with ?debug in the URL; not visible in normal play) -->
+<button id="dbgToggle" onclick="toggleDebug()">🛠 Debug</button>
+<div id="dbgPanel"></div>
+
+<script src="js/pilot-characters.js"></script>
+<script src="js/sebastian.js"></script>
+<script src="js/daniel.js"></script>
+<script src="js/julian.js"></script>
+<script src="js/engine.js"></script>
+</body>
+</html>
