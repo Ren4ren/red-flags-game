@@ -127,6 +127,31 @@
     55% { opacity: .85; }
     100% { opacity: 0; transform: translateY(8px) scale(.94); filter: blur(1.5px); }
   }
+
+  /* 測試模式（只在網址帶 ?debug 時出現；朋友看不到） */
+  #dbgToggle {
+    position: fixed; bottom: 14px; right: 14px; z-index: 50;
+    background: rgba(40,30,50,.92); color: #e8a8b8; border: 1px solid rgba(200,120,140,.4);
+    border-radius: 20px; padding: 7px 13px; font-size: .8rem; cursor: pointer; font-family: inherit;
+  }
+  #dbgPanel {
+    position: fixed; bottom: 56px; right: 14px; z-index: 50; width: 256px; display: none;
+    background: rgba(20,16,26,.98); border: 1px solid rgba(200,120,140,.35); border-radius: 12px;
+    padding: 12px 14px; color: var(--text); box-shadow: 0 10px 40px rgba(0,0,0,.5);
+    max-height: 82vh; overflow-y: auto;
+  }
+  #dbgPanel.open { display: block; }
+  .dbg-title { font-size: .82rem; color: #e8a8b8; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+  .dbg-x { background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: .9rem; }
+  .dbg-sect { margin: 10px 0; color: var(--text-dim); font-size: .74rem; }
+  .dbg-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .dbg-chip {
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); color: var(--text);
+    border-radius: 8px; padding: 5px 9px; font-size: .75rem; cursor: pointer; font-family: inherit;
+  }
+  .dbg-chip.on { background: rgba(200,120,140,.25); border-color: rgba(200,120,140,.5); color: #e8a8b8; }
+  .dbg-sw { color: var(--text); margin-left: 6px; }
+  .dbg-state { margin-top: 6px; line-height: 1.85; color: var(--text); font-family: 'Space Mono', monospace; font-size: .72rem; }
 </style>
 </head>
 <body class="anth-body">
@@ -193,6 +218,10 @@
   <section class="epilogue-screen anth-ep" id="endingScreen"></section>
 
 </main>
+
+<!-- 測試模式（只在網址帶 ?debug 時出現；正式遊玩看不到） -->
+<button id="dbgToggle" onclick="toggleDebug()">🛠 測試</button>
+<div id="dbgPanel"></div>
 
 <script src="../js/anthology/pilot-characters.js"></script>
 <script src="../js/anthology/sebastian.js"></script>

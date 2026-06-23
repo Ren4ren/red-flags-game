@@ -223,6 +223,7 @@ function renderPool() {
     : '點開卡片，看仔細，再決定。<br>離開，永遠是選項之一。';
   foot.innerHTML = footLine +
     '<div class="pool-reset"><button class="pool-reset-btn" onclick="resetLife()">換一個人生 ↺</button></div>';
+  renderDebugPanel();
 }
 
 // ── 個人檔案 ──
@@ -316,6 +317,7 @@ function addStress(n) {
   stress += n;
   if (!brokeDown && stress >= stressMax) breakdownPending = true; // 過線：下一拍演出爆發
   updateStressBar();
+  renderDebugPanel();
 }
 
 // 爆發效果：留下「自責」傷痕、內在資源往下漂——寫回 state.resources 並存檔（持久化＝改寫下一場）
@@ -327,6 +329,7 @@ function applyBreakdownEffects() {
   state.resources.邊界感 = Math.max(0, (state.resources.邊界感 || 0) - DRIFT_AFTER_BREAKDOWN);
   saveAnth();
   updateStressBar();
+  renderDebugPanel();
 }
 
 // 糾纏：離開時依獵物價值分級（純演出、不阻擋）
@@ -483,6 +486,7 @@ function renderBeat() {
   nextBtn.textContent = '繼續 →';
   nextBtn.disabled = true;
   document.getElementById('choicesArea').style.display = 'none';
+  renderDebugPanel(); // 測試面板開著的話，刷新即時數值
 
   // 壓力過線（有鏡片的篇）：先演自責螺旋爆發，再進本拍
   if (breakdownPending && ep.lens && ep.lens.breakdown) {
@@ -825,5 +829,83 @@ function finish(endKey) {
   s.scrollTop = 0;
 }
 
+// ── 測試面板（只在網址帶 ?debug 時出現；正式遊玩看不到）──
+function toggleDebug() {
+  const p = document.getElementById('dbgPanel');
+  if (p.classList.toggle('open')) renderDebugPanel();
+}
+function dbgInstant(on) { DEBUG.instant = on; renderDebugPanel(); }
+function dbgForce(mode) { DEBUG.force = mode; renderDebugPanel(); }
+function dbgArchetype(id) {
+  // 快速換角色（不問確認）：重設資源為該原型；在某篇中就重開該篇，否則回池子
+  state.archetype = id;
+  state.resources = JSON.parse(JSON.stringify(PILOT_CHARACTERS[id].resources));
+  state.insight = Math.max(state.insight, observationToInsight(state.resources.觀察力));
+  saveAnth();
+  if (ep && document.getElementById('chatWrap').classList.contains('visible')) startEpisode(ep.id);
+  else renderPool();
+  renderDebugPanel();
+}
+function dbgPlay(id) { if (!state.resources) dbgArchetype('everywoman'); startEpisode(id); renderDebugPanel(); }
+function dbgStress() { if (ep && ep.lens) addStress(STRESS_SWALLOW); }
+function dbgBreak() { if (ep && ep.lens) { stress = stressMax; addStress(0); } } // 過線→下一拍/跳拍時爆發
+function dbgJump(n) {
+  if (!ep) return;
+  clearRenderTimers();
+  beatIdx = Math.max(0, Math.min(ep.beats.length - 1, n));
+  show('chat');
+  renderBeat();
+}
+function dbgWipe() { localStorage.removeItem(ANTH_KEY); location.reload(); }
+
+function renderDebugPanel() {
+  const p = document.getElementById('dbgPanel');
+  if (!p || !p.classList.contains('open')) return;
+  const hasChar = !!state.resources;
+  const inEp = !!ep && document.getElementById('chatWrap').classList.contains('visible');
+  const sa = hasChar ? computeSA() : '—';
+  const odds = hasChar ? expressiveChance() + '%' : '—';
+  const tier = hasChar ? insightTier(liveInsight || state.insight).name : '—';
+  const who = state.archetype ? PILOT_CHARACTERS[state.archetype].archetype : '（未選角）';
+  const prey = (inEp && ep.lens) ? ep.lens.preyValue(state.resources) : null;
+  const beatBtns = inEp ? ep.beats.map((b, i) => `<button class="dbg-chip" onclick="dbgJump(${i})">${i + 1}</button>`).join('') : '<span class="dbg-sw">（先進一篇）</span>';
+  const forceOpts = [['random', '隨機'], ['win', '必成功'], ['lose', '必失敗']]
+    .map(([v, t]) => `<button class="dbg-chip ${DEBUG.force === v ? 'on' : ''}" onclick="dbgForce('${v}')">${t}</button>`).join('');
+  const epBtns = POOL_ORDER.map(id => `<button class="dbg-chip" onclick="dbgPlay('${id}')">${EPISODES[id].name}</button>`).join('');
+  p.innerHTML = `
+    <div class="dbg-title">🛠 測試模式 <button class="dbg-x" onclick="toggleDebug()">✕</button></div>
+    <div class="dbg-sect">⏩ 快速模式（關動畫/延遲）
+      <label class="dbg-sw"><input type="checkbox" ${DEBUG.instant ? 'checked' : ''} onchange="dbgInstant(this.checked)"> ${DEBUG.instant ? '開' : '關'}</label>
+    </div>
+    <div class="dbg-sect">🎲 擲骰結果<div class="dbg-row">${forceOpts}</div></div>
+    <div class="dbg-sect">⚡ 換角色（重設資源）<div class="dbg-row">
+      <button class="dbg-chip" onclick="dbgArchetype('heiress')">富家女</button>
+      <button class="dbg-chip" onclick="dbgArchetype('everywoman')">普通</button>
+      <button class="dbg-chip" onclick="dbgArchetype('singlemom')">單親媽媽</button>
+    </div></div>
+    <div class="dbg-sect">📂 跳進某個男人<div class="dbg-row">${epBtns}</div></div>
+    <div class="dbg-sect">➡ 跳到第幾拍<div class="dbg-row">${beatBtns}</div></div>
+    <div class="dbg-sect">💥 壓力<div class="dbg-row">
+      <button class="dbg-chip" onclick="dbgStress()">+22 壓力</button>
+      <button class="dbg-chip" onclick="dbgBreak()">逼到爆發</button>
+    </div></div>
+    <div class="dbg-sect">🔍 隱藏數值（即時）<div class="dbg-state">
+      角色：${who}<br>
+      SA（說出口）：${sa}　勝算：${odds}<br>
+      識人之眼：${tier}（值 ${liveInsight}）<br>
+      壓力：${inEp && ep.lens ? stress + ' / ' + stressMax + (brokeDown ? '（已爆發）' : (breakdownPending ? '（下一拍爆發）' : '')) : '—'}<br>
+      獵物價值：${prey !== null ? prey + '（' + clingTier(prey) + '）' : '—'}<br>
+      傷痕：${state.traits.join('、') || '（無）'}<br>
+      已戳破：${[...flags].join('、') || '（無）'}<br>
+      說出口：${spoke.tries ? spoke.wins + ' / ' + spoke.tries : '—'}
+    </div></div>
+    <div class="dbg-sect"><button class="dbg-chip" onclick="dbgWipe()">🗑 清存檔重來</button></div>`;
+}
+
 // ── INIT ──
+// 測試鈕只在網址帶 ?debug（如 ?debug=1）時出現——朋友試玩看不到，作者自己測才加。
+(function () {
+  const t = document.getElementById('dbgToggle');
+  if (t && !/[?&]debug/.test(location.search)) t.style.display = 'none';
+})();
 show('pool');
