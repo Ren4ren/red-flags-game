@@ -28,6 +28,42 @@ const EP_DANIEL = {
     { flag: 'msf', q: '一筆說不清楚的存款——秘密？', a: '無國界醫療的半年。一個比表面更好的人。' },
   ],
 
+  // ── 鏡片（資源機制）──
+  // Daniel 是好人。壓力代表玩家的積壓焦慮；「說出口」是脆弱但必要的溝通。
+  // 糾纏（clinging）換成 Daniel 的善意告別——同樣的機制，不同的人性。
+  lens: {
+    dice: {
+      boundary: {
+        failInner: '妳打好了「我有點不安」，看著那四個字，還是刪掉了。\n說出來，好像很難。',
+        failReply: [
+          { note: '妳沒說。他繼續傳很短的訊息，妳繼續盯著，猜。' },
+        ]
+      },
+    },
+    breakdown: {
+      messages: [
+        { inner: '（又是這樣。先說得好好的，然後就——）' },
+        { inner: '（不對。他不是那個人。可是妳不知道怎麼停下來。）' },
+      ]
+    },
+    clingEnds: ['leave2', 'ghost'],
+    clinging: {
+      high: [
+        { him: '好的。', time: '隔天' },
+        { him: '如果妳哪天想聊，我在。', time: '隔天' },
+        { him: '照顧自己。', time: '隔天' },
+      ],
+      mid: [
+        { him: '好。', time: '隔天' },
+        { him: '希望妳之後遇到的人讓妳舒服一點。', time: '隔天' },
+      ],
+      low: [
+        { him: '好的，保重。', time: '隔天' },
+      ],
+    },
+    preyValue(res) { return 40; } // Daniel 不是掠食者；固定 mid 告別不因資源差異而異
+  },
+
   beats: [
     // ── 第 1 拍：開聊（很慢）──
     {
@@ -66,7 +102,7 @@ const EP_DANIEL = {
         { note: '上麵之前，他幫兩碗麵各拍了一張照。\n「傳給我媽。她不信我有好好吃飯。」' },
         { him: '妳上次說的那個案子，後來過了嗎？', time: '現場' },
         { note: '他等妳講完，才接話。\n中間堅持麵要先拌再吃，講了三十秒的拌麵原理。表情非常嚴肅。' },
-        { inner: '記得妳說過的每件事——\nSebastian 也記得。\n背過劇本的人，都記得。', trait: 'guarded' },
+        { inner: '記得妳說過的每件事——\nSebastian 也記得。\n會不會……這也是套路。', trait: 'guarded' },
         { inner: '他講拌麵的樣子，\n像在守護什麼重要的東西。', skipIfTrait: 'guarded' },
       ],
       choices: [

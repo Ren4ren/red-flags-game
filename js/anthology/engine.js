@@ -95,9 +95,9 @@ function anthStart() {
 }
 
 // ── 選角（人生只有一次）──
-function statBar(label, val, active) {
+function statBar(label, val, active, tip) {
   return `
-    <div class="stat-row ${active ? 'active' : ''}">
+    <div class="stat-row ${active ? 'active' : ''}"${tip ? ` data-tip="${tip}"` : ''}>
       <div class="stat-label">${label}${active ? ' <span class="stat-tag">看見</span>' : ''}</div>
       <div class="stat-bar"><div class="stat-fill" style="width:${val}%"></div></div>
       <div class="stat-val">${val}</div>
@@ -126,10 +126,11 @@ function renderCharSelect() {
       </div>
       <div class="charsel-blurb">${c.blurb}</div>
       <div class="charsel-stats">
-        ${statBar('觀察力', r.觀察力, true)}
-        ${statBar('自信', r.自信, false)}
-        ${statBar('邊界感', r.邊界感, false)}
-        ${statBar('韌性', r.韌性, false)}
+        ${statBar('觀察力', r.觀察力, true, '看得見紅旗的能力。越高，越早注意到不對勁的細節。')}
+        ${statBar('自信', r.自信, false, '敢不敢把不安說出口。影響「說出口」的勝算（SA）。')}
+        ${statBar('邊界感', r.邊界感, false, '守不守得住界線。過弱易被剝削，過強可能築牆。與自信合算 SA。')}
+        ${statBar('警戒', r.警戒 || 0, false, '對陌生人的防備心。過低易被接近，過高傷及好人。（目前展示用）')}
+        ${statBar('韌性', r.韌性, false, '被壓力磨多久才爆發。越高越能撐住。')}
       </div>
       <div class="charsel-foot">
         <span class="charsel-eye">識人之眼起點：<b class="${tier.cls}">${tier.name}</b></span>

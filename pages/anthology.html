@@ -128,6 +128,18 @@
     100% { opacity: 0; transform: translateY(8px) scale(.94); filter: blur(1.5px); }
   }
 
+  /* 屬性說明 tooltip（選角畫面 stat-row 滑鼠移過去顯示）*/
+  .stat-row[data-tip] { position: relative; cursor: default; }
+  .stat-row[data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute; left: 0; bottom: calc(100% + 5px);
+    background: rgba(20,16,26,.97); border: 1px solid rgba(200,120,140,.28);
+    color: var(--text-dim); font-size: .74rem; line-height: 1.55;
+    padding: 7px 11px; border-radius: 8px; width: 218px;
+    white-space: normal; pointer-events: none; z-index: 20;
+    animation: fadeUp .15s ease both;
+  }
+
   /* 測試模式（只在網址帶 ?debug 時出現；朋友看不到） */
   #dbgToggle {
     position: fixed; bottom: 14px; right: 14px; z-index: 50;
