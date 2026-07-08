@@ -35,7 +35,7 @@ function removeTrait(id) { state.traits = state.traits.filter(t => t !== id); }
 // 識人之眼：不顯示數字，只顯示階。高階＝注意到的線索更多。
 function insightTier(n) {
   if (n >= 6) return { name: '老練', cls: 'good', desc: '你幾乎一眼就讀得出不對勁。' };
-  if (n >= 3) return { name: '識人', cls: 'good', desc: '那些不對勁的小地方，你開始看得見了。' };
+  if (n >= 3) return { name: '識人', cls: 'good', desc: '你開始看得見那些不對勁的小地方。' };
   if (n >= 1) return { name: '留心', cls: '',     desc: '你比以前多看了一眼。' };
   return            { name: '天真', cls: '',      desc: '你還願意相信大部分人說的話。' };
 }
@@ -75,6 +75,8 @@ let brokeDown = false;
 let breakdownPending = false;
 let diceIv = null;
 let spoke = { tries: 0, wins: 0 };
+let charPreview = null;
+let charStatHelp = null;
 
 // ── 畫面切換 ──
 function show(id) {
@@ -90,60 +92,116 @@ function anthStart() {
   ts.classList.add('hiding');
   setTimeout(() => { ts.style.display = 'none'; }, 600);
   // 已選過人生＝直接進池子；第一次＝先選你是誰
-  if (state.archetype && PILOT_CHARACTERS[state.archetype]) renderPool();
+  if (state.archetype && PLAYER_ARCHETYPES[state.archetype]) renderPool();
   else renderCharSelect();
 }
 
+function returnToTitle() {
+  charPreview = null;
+  charStatHelp = null;
+  show(null);
+  const ts = document.getElementById('titleScreen');
+  ts.style.display = 'flex';
+  ts.classList.remove('hiding');
+}
+
 // ── 選角（人生只有一次）──
-function statBar(label, val, active, tip) {
+function statBar(id, label, val, active, tip) {
+  const key = `${id}:${label}`;
+  const open = charStatHelp === key;
   return `
-    <div class="stat-row ${active ? 'active' : ''}"${tip ? ` data-tip="${tip}"` : ''}>
-      <div class="stat-label">${label}${active ? ' <span class="stat-tag">看見</span>' : ''}</div>
-      <div class="stat-bar"><div class="stat-fill" style="width:${val}%"></div></div>
-      <div class="stat-val">${val}</div>
+    <div class="stat-row ${active ? 'active' : ''}">
+      <div class="stat-mainline">
+        <div class="stat-name">
+          <span class="stat-label">${label}</span>
+          <button class="stat-help" type="button" data-stat-help="${key}" aria-label="${label}說明" aria-expanded="${open ? 'true' : 'false'}">?</button>
+        </div>
+        <div class="stat-bar"><div class="stat-fill" style="width:${val}%"></div></div>
+        <div class="stat-val">${val}</div>
+      </div>
+      ${open ? `<div class="stat-copy">${tip}</div>` : ''}
     </div>`;
+}
+
+function setCharPreview(id) {
+  charPreview = charPreview === id ? null : id;
+  charStatHelp = null;
+  renderCharSelect();
 }
 
 function renderCharSelect() {
   show('select');
   const wrap = document.getElementById('charCards');
   wrap.innerHTML = '';
-  PILOT_ORDER.forEach((id, i) => {
-    const c = PILOT_CHARACTERS[id];
+  if (!charPreview || !PLAYER_ARCHETYPES[charPreview]) charPreview = null;
+  PLAYER_ARCHETYPE_ORDER.forEach((id, i) => {
+    const c = PLAYER_ARCHETYPES[id];
     const r = c.resources;
     const tier = insightTier(observationToInsight(r.觀察力));
+    const isActive = charPreview === id;
     const card = document.createElement('div');
-    card.className = 'charsel-card';
+    card.className = 'charsel-card' + (isActive ? ' is-active' : '');
     card.style.animationDelay = `${i * 100}ms`;
-    card.onclick = () => selectArchetype(id);
+    card.tabIndex = 0;
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-expanded', isActive ? 'true' : 'false');
+    card.onclick = () => setCharPreview(id);
+    card.onkeydown = (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        setCharPreview(id);
+      }
+    };
     card.innerHTML = `
       <div class="charsel-top">
-        <div class="charsel-avatar" style="${c.avatarStyle}">${c.avatarText}</div>
-        <div>
-          <div class="charsel-arch">${c.archetype}</div>
-          <div class="charsel-tag">${c.tagline}</div>
+        <div class="charsel-main">
+          <div class="charsel-avatar" style="${c.avatarStyle}">${c.avatarText}</div>
+          <div class="charsel-copy">
+            <div class="charsel-arch">${c.archetype}</div>
+            <div class="charsel-tag">${c.tagline}</div>
+          </div>
         </div>
+        <div class="charsel-state">${isActive ? '再點收起' : '點開看細節'}</div>
       </div>
       <div class="charsel-blurb">${c.blurb}</div>
-      <div class="charsel-stats">
-        ${statBar('觀察力', r.觀察力, true, '看得見紅旗的能力。越高，越早注意到不對勁的細節。')}
-        ${statBar('自信', r.自信, false, '敢不敢把不安說出口。影響「說出口」的勝算（SA）。')}
-        ${statBar('邊界感', r.邊界感, false, '守不守得住界線。過弱易被剝削，過強可能築牆。與自信合算 SA。')}
-        ${statBar('警戒', r.警戒 || 0, false, '對陌生人的防備心。過低易被接近，過高傷及好人。（目前展示用）')}
-        ${statBar('韌性', r.韌性, false, '被壓力磨多久才爆發。越高越能撐住。')}
+      <div class="charsel-details">
+        <div class="charsel-summary">
+          <span class="charsel-chip">一開始的察覺：<strong class="${tier.cls}">${tier.name}</strong></span>
+          <span class="charsel-chip">離開難度：<strong>${c.leaveCost}</strong></span>
+        </div>
+        <div class="charsel-stats">
+          ${statBar(id, '察覺', r.觀察力, true, '數字越高就越早注意到對方話裡不太對勁的地方。')}
+          ${statBar(id, '開口', r.自信, false, '影響妳能不能把不舒服說出來。')}
+          ${statBar(id, '界線', r.邊界感, false, '影響妳能不能守住自己的節奏。')}
+          ${statBar(id, '警戒', r.警戒 || 0, false, '影響妳一開始會不會先多看一眼。')}
+          ${statBar(id, '承受', r.韌性, false, '影響妳在壓力爆發前能撐多久。')}
+        </div>
+        <div class="charsel-actions">
+          <button class="charsel-btn" type="button">選這一種人生 →</button>
+        </div>
       </div>
-      <div class="charsel-foot">
-        <span class="charsel-eye">識人之眼起點：<b class="${tier.cls}">${tier.name}</b></span>
-        <span class="charsel-cost">離開代價：${c.leaveCost}</span>
-      </div>
-      <button class="charsel-btn">選她，進池子 →</button>`;
+      `;
+    const selectBtn = card.querySelector('.charsel-btn');
+    if (selectBtn) {
+      selectBtn.onclick = (e) => {
+        e.stopPropagation();
+        selectArchetype(id);
+      };
+    }
+    card.querySelectorAll('.stat-help').forEach(btn => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        charStatHelp = charStatHelp === btn.dataset.statHelp ? null : btn.dataset.statHelp;
+        renderCharSelect();
+      };
+    });
     wrap.appendChild(card);
   });
 }
 
 function selectArchetype(id) {
   state.archetype = id;
-  state.resources = JSON.parse(JSON.stringify(PILOT_CHARACTERS[id].resources)); // 深拷貝：資源會被約會改寫，不污染母資料
+  state.resources = JSON.parse(JSON.stringify(PLAYER_ARCHETYPES[id].resources)); // 深拷貝：資源會被約會改寫，不污染母資料
   state.insight = Math.max(state.insight, observationToInsight(state.resources.觀察力)); // 觀察力＝識人之眼的起點
   saveAnth();
   renderPool();
@@ -177,7 +235,7 @@ function renderPool() {
     traitHtml = '<div class="trait-empty">（還是新的。暫時。）</div>';
   }
   const tier = insightTier(state.insight);
-  const meChar = state.archetype ? PILOT_CHARACTERS[state.archetype] : null;
+  const meChar = state.archetype ? PLAYER_ARCHETYPES[state.archetype] : null;
   const meAvatar = meChar ? meChar.avatarStyle : 'background:linear-gradient(135deg,#4a3f6b,#2d3a5a)';
   const meSub = meChar ? `${meChar.archetype} · 識人之眼 ${tier.name}` : `識人之眼 · ${tier.name}`;
   me.innerHTML = `
@@ -202,7 +260,7 @@ function renderPool() {
       const endTitle = e.endings[st.ending] ? e.endings[st.ending].title : '';
       stateLine = `<div class="pool-card-state"><span class="done-tag">已讀完</span> · ${endTitle} · 點擊可重讀</div>`;
     } else if (st.skipped) {
-      stateLine = '<div class="pool-card-state"><span class="skip-tag">妳滑掉過他 · 他還在池子裡</span></div>';
+      stateLine = '<div class="pool-card-state"><span class="skip-tag">妳滑掉過他 · 他還會再出現</span></div>';
     }
     card.innerHTML = `
       <div class="pool-card-top">
@@ -220,8 +278,8 @@ function renderPool() {
   const foot = document.getElementById('poolFoot');
   const allDone = POOL_ORDER.every(id => state.episodes[id] && state.episodes[id].done);
   const footLine = allDone
-    ? '第一池結束。<br>……池子深處，一個「正在輸入」的氣泡，閃了一下。'
-    : '點開卡片，看仔細，再決定。<br>離開，永遠是選項之一。';
+    ? '這一輪快結束了。<br>……更後面，還有人正在輸入。'
+    : '先看仔細，再決定。<br>離開永遠是選項之一。';
   foot.innerHTML = footLine +
     '<div class="pool-reset"><button class="pool-reset-btn" onclick="resetLife()">換一個人生 ↺</button></div>';
   renderDebugPanel();
@@ -289,7 +347,7 @@ function startEpisode(id) {
     brokeDown = false;
     breakdownPending = false;
     const tier = insightTier(liveInsight);
-    const who = state.archetype ? PILOT_CHARACTERS[state.archetype].archetype : '妳';
+    const who = state.archetype ? PLAYER_ARCHETYPES[state.archetype].archetype : '妳';
     roleBar.innerHTML = `你扮演 <b>${who}</b> · 識人之眼 <b class="${tier.cls}">${tier.name}</b> · 說出口 SA <b>${computeSA()}</b>`;
     roleBar.style.display = 'block';
     stressWrap.style.display = 'flex';
@@ -342,7 +400,7 @@ function playClinging(onDone) {
 }
 
 function confirmExit() {
-  if (confirm('要放下手機、回到池子嗎？這一篇的進度不會保留。')) {
+  if (confirm('要放下手機、回到配對列表嗎？這一篇的進度不會保留。')) {
     clearRenderTimers();
     renderPool();
   }
@@ -486,7 +544,7 @@ function renderBeat() {
   const nextBtn = document.getElementById('nextBtn');
   nextBtn.textContent = '繼續 →';
   nextBtn.disabled = true;
-  document.getElementById('choicesArea').style.display = 'none';
+  clearChoicesArea();
   renderDebugPanel(); // 測試面板開著的話，刷新即時數值
 
   // 壓力過線（有鏡片的篇）：先演自責螺旋爆發，再進本拍
@@ -506,16 +564,22 @@ function refreshRoleBar() {
   const roleBar = document.getElementById('roleBar');
   if (!ep.lens || roleBar.style.display === 'none') return;
   const tier = insightTier(liveInsight);
-  const who = state.archetype ? PILOT_CHARACTERS[state.archetype].archetype : '妳';
+  const who = state.archetype ? PLAYER_ARCHETYPES[state.archetype].archetype : '妳';
   roleBar.innerHTML = `你扮演 <b>${who}</b> · 識人之眼 <b class="${tier.cls}">${tier.name}</b> · 說出口 SA <b>${computeSA()}</b>`;
+}
+
+function clearChoicesArea() {
+  const area = document.getElementById('choicesArea');
+  area.querySelectorAll('.choice-btn').forEach(el => el.remove());
+  area.style.display = 'none';
+  return area;
 }
 
 function showChoices(choices) {
   // 識人之眼不夠的玩家，看不到「需要更利的眼睛才會出現」的觀察選項（只能加、不能鎖：天真玩家仍有其餘選項可玩）
   const shown = choices.filter(c => !c.minInsight || liveInsight >= c.minInsight);
   currentChoices = shown;
-  const area = document.getElementById('choicesArea');
-  area.querySelectorAll('.choice-btn').forEach(el => el.remove());
+  const area = clearChoicesArea();
   shown.forEach((c, i) => {
     const dice = ep.lens && c.flag && ep.lens.dice && ep.lens.dice[c.flag]; // 抵抗型＝說出口擲骰
     const btn = document.createElement('button');
@@ -635,7 +699,7 @@ function rollDice(text, chance, cb) {
 function choose(i) {
   const c = currentChoices[i];
   const dice = ep.lens && c.flag && ep.lens.dice && ep.lens.dice[c.flag];
-  document.getElementById('choicesArea').style.display = 'none';
+  clearChoicesArea();
   const msgs = document.getElementById('messages');
   breakHimGroup(msgs);
 
@@ -744,7 +808,7 @@ function finish(endKey) {
   if (ending.anatomy) {
     const a = document.createElement('div');
     a.className = 'anatomy-block';
-    a.innerHTML = '<div class="profile-block-label">劇本解剖——他的每一步，都對應劇本的哪一頁</div>';
+    a.innerHTML = '<div class="profile-block-label">劇本解剖——他的每一步都對應劇本的哪一頁</div>';
     ending.anatomy.forEach((row, i) => {
       const r = document.createElement('div');
       r.className = 'anatomy-row';
@@ -772,7 +836,7 @@ function finish(endKey) {
   if (ending.showChecklist && ep.telltales) {
     const fc = document.createElement('div');
     fc.className = 'flagcheck-block';
-    fc.innerHTML = `<div class="profile-block-label">${ep.id === 'daniel' ? '偽破綻——看起來像紅旗的，其實是' : '破綻清單——一直都在那裡的'}</div>`;
+    fc.innerHTML = `<div class="profile-block-label">${ep.id === 'daniel' ? '偽破綻——看起來像紅旗但其實是' : '破綻清單——一直都在那裡的'}</div>`;
     ep.telltales.forEach((t, i) => {
       const hit = t.flag && flags.has(t.flag);
       const row = document.createElement('div');
@@ -796,7 +860,7 @@ function finish(endKey) {
       const sym = traitBlock.regress ? '↘ ' : (traitBlock.healed ? '✦ ' : '＋ ');
       nameHtml = `<div class="trait-award-name ${tr.cls}">${sym}${tr.name}</div>`;
     }
-    const awardLabel = traitBlock.regress ? '妳的卡片，倒退了一格' : ('妳的卡片' + (traitBlock.add ? '被改寫了' : ''));
+    const awardLabel = traitBlock.regress ? '妳的卡片倒退了一格' : ('妳的卡片' + (traitBlock.add ? '被改寫了' : ''));
     tb.innerHTML = `
       <div class="trait-award-label">${awardLabel}</div>
       ${nameHtml}
@@ -823,7 +887,7 @@ function finish(endKey) {
 
   const back = document.createElement('div');
   back.className = 'replay-area';
-  back.innerHTML = `<button class="replay-btn" onclick="renderPool()">回到池子</button><div class="replay-note">池子裡，還有別人。</div>`;
+  back.innerHTML = `<button class="replay-btn" onclick="renderPool()">回到列表</button><div class="replay-note">你還會遇到別人。</div>`;
   s.appendChild(back);
 
   show('ending');
@@ -840,7 +904,7 @@ function dbgForce(mode) { DEBUG.force = mode; renderDebugPanel(); }
 function dbgArchetype(id) {
   // 快速換角色（不問確認）：重設資源為該原型；在某篇中就重開該篇，否則回池子
   state.archetype = id;
-  state.resources = JSON.parse(JSON.stringify(PILOT_CHARACTERS[id].resources));
+  state.resources = JSON.parse(JSON.stringify(PLAYER_ARCHETYPES[id].resources));
   state.insight = Math.max(state.insight, observationToInsight(state.resources.觀察力));
   saveAnth();
   if (ep && document.getElementById('chatWrap').classList.contains('visible')) startEpisode(ep.id);
@@ -867,7 +931,7 @@ function renderDebugPanel() {
   const sa = hasChar ? computeSA() : '—';
   const odds = hasChar ? expressiveChance() + '%' : '—';
   const tier = hasChar ? insightTier(liveInsight || state.insight).name : '—';
-  const who = state.archetype ? PILOT_CHARACTERS[state.archetype].archetype : '（未選角）';
+  const who = state.archetype ? PLAYER_ARCHETYPES[state.archetype].archetype : '（未選角）';
   const prey = (inEp && ep.lens) ? ep.lens.preyValue(state.resources) : null;
   const beatBtns = inEp ? ep.beats.map((b, i) => `<button class="dbg-chip" onclick="dbgJump(${i})">${i + 1}</button>`).join('') : '<span class="dbg-sw">（先進一篇）</span>';
   const forceOpts = [['random', '隨機'], ['win', '必成功'], ['lose', '必失敗']]

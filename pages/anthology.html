@@ -18,54 +18,124 @@
     scrollbar-width: thin; scrollbar-color: var(--border) transparent;
   }
   .charsel-head { text-align: center; margin: 28px 0 18px; }
+  .charsel-back {
+    align-self: flex-start; margin: 18px 0 0 18px;
+    font-family: var(--font-mono); font-size: .72rem; letter-spacing: .08em;
+    color: var(--text-dimmer); background: rgba(255,250,240,.62);
+    border: 1px solid rgba(49,33,23,.16); border-radius: 999px;
+    padding: 7px 12px; cursor: pointer; transition: all .15s ease;
+  }
+  .charsel-back:hover, .charsel-back:focus-visible {
+    color: var(--text); border-color: rgba(49,33,23,.34);
+    background: rgba(255,250,240,.9);
+  }
   .charsel-title { font-size: 1.5rem; letter-spacing: .04em; color: var(--text); }
   .charsel-sub { margin-top: 8px; color: var(--text-dim); font-size: .92rem; line-height: 1.7; }
+  .charsel-hintline {
+    margin-top: 10px; font-family: var(--font-mono); font-size: .72rem;
+    letter-spacing: .08em; color: var(--text-dimmer); text-transform: uppercase;
+  }
   .charsel-cards { display: flex; flex-direction: column; gap: 16px; max-width: 560px; margin: 0 auto 40px; }
 
   .charsel-card {
-    background: var(--card, #1a1622); border: 1px solid rgba(255,255,255,.08);
+    position: relative; overflow: hidden;
+    background: rgba(255,249,237,.92); border: 2px solid rgba(49,33,23,.16);
     border-radius: 14px; padding: 18px 18px 16px; cursor: pointer;
-    transition: border-color .2s, transform .15s, box-shadow .2s;
+    transition: border-color .2s, transform .15s, box-shadow .2s, background .2s;
+    box-shadow: 6px 6px 0 rgba(49,33,23,.08);
     animation: fadeUp .5s ease both;
   }
-  .charsel-card:hover { border-color: rgba(200,120,140,.55); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,.35); }
+  .charsel-card::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+    background: linear-gradient(180deg, rgba(227,111,88,.75), rgba(47,135,145,.75));
+    opacity: .18; transition: opacity .2s ease;
+  }
+  .charsel-card:hover { border-color: rgba(183,53,47,.34); transform: translateY(-2px); box-shadow: 9px 9px 0 rgba(49,33,23,.10); }
+  .charsel-card:hover::before { opacity: .45; }
+  .charsel-card:focus-visible {
+    outline: 3px solid rgba(47,135,145,.35);
+    outline-offset: 3px;
+  }
+  .charsel-card.is-active {
+    border-color: rgba(183,53,47,.48);
+    background: linear-gradient(180deg, rgba(255,250,240,.98), rgba(255,244,223,.98));
+    box-shadow: 12px 12px 0 rgba(183,53,47,.10);
+  }
+  .charsel-card.is-active::before { opacity: 1; }
 
-  .charsel-top { display: flex; align-items: center; gap: 14px; }
+  .charsel-top { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+  .charsel-main { display: flex; align-items: center; gap: 14px; min-width: 0; }
   .charsel-avatar {
     width: 52px; height: 52px; border-radius: 50%; flex: 0 0 auto;
     display: flex; align-items: center; justify-content: center;
     font-size: 1.3rem; color: #fff; font-weight: 600;
+    border: 2px solid rgba(49,33,23,.22); box-shadow: 3px 3px 0 rgba(49,33,23,.10);
   }
+  .charsel-copy { min-width: 0; }
   .charsel-arch { font-size: 1.15rem; color: var(--text); letter-spacing: .03em; }
   .charsel-tag { margin-top: 3px; color: var(--text-dim); font-size: .88rem; }
-  .charsel-blurb { margin: 12px 2px 14px; color: var(--text-dim); font-size: .86rem; line-height: 1.65; font-style: italic; }
+  .charsel-state {
+    font-family: var(--font-mono); font-size: .68rem; letter-spacing: .08em;
+    color: var(--text-dimmer); text-transform: uppercase; flex: 0 0 auto;
+    padding: 5px 8px; border-radius: 999px; background: rgba(49,33,23,.05);
+    white-space: nowrap;
+  }
+  .charsel-card.is-active .charsel-state {
+    color: var(--accent); background: rgba(183,53,47,.10);
+  }
+  .charsel-blurb { margin: 12px 2px 10px; color: var(--text-dim); font-size: .88rem; line-height: 1.7; font-style: italic; }
+  .charsel-summary { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 2px 12px; }
+  .charsel-chip {
+    font-family: var(--font-mono); font-size: .7rem; letter-spacing: .04em;
+    color: var(--text-dim); padding: 5px 9px; border-radius: 999px;
+    border: 1px solid rgba(49,33,23,.14); background: rgba(255,250,240,.72);
+  }
+  .charsel-chip strong { color: var(--text); font-weight: 700; }
+  .charsel-chip strong.good { color: var(--green); }
+  .charsel-details {
+    display: none; margin-top: 14px; padding-top: 14px;
+    border-top: 1px solid rgba(49,33,23,.12);
+  }
+  .charsel-card.is-active .charsel-details { display: block; animation: fadeUp .22s ease both; }
 
   .charsel-stats { display: flex; flex-direction: column; gap: 7px; margin: 0 2px 14px; }
-  .stat-row { display: flex; align-items: center; gap: 10px; opacity: .45; }
-  .stat-row.active { opacity: 1; }
-  .stat-label { flex: 0 0 96px; font-size: .8rem; color: var(--text-dim); }
-  .stat-row.active .stat-label { color: var(--text); }
-  .stat-tag {
-    font-size: .62rem; background: rgba(200,120,140,.22); color: #e8a8b8;
-    padding: 1px 6px; border-radius: 8px; margin-left: 4px; letter-spacing: .05em;
+  .stat-row {
+    padding: 8px 10px; border-radius: 10px; background: rgba(255,250,240,.72);
+    border: 1px solid rgba(49,33,23,.10);
   }
-  .stat-bar { flex: 1; height: 6px; background: rgba(255,255,255,.08); border-radius: 4px; overflow: hidden; }
-  .stat-fill { height: 100%; background: rgba(255,255,255,.3); border-radius: 4px; }
+  .stat-row.active { background: rgba(183,53,47,.08); border-color: rgba(183,53,47,.18); }
+  .stat-mainline { display: grid; grid-template-columns: 72px minmax(80px, 1fr) 34px; align-items: center; gap: 9px; }
+  .stat-name { display: flex; align-items: center; gap: 5px; min-width: 0; }
+  .stat-label { font-size: .78rem; color: var(--text-dim); white-space: nowrap; }
+  .stat-row.active .stat-label { color: var(--text); }
+  .stat-help {
+    width: 26px; height: 26px; min-width: 26px; border-radius: 50%;
+    border: 1px solid rgba(49,33,23,.18); background: rgba(255,250,240,.78);
+    color: var(--text-dimmer); font-family: var(--font-mono); font-size: .72rem;
+    cursor: pointer; line-height: 1; transition: all .15s ease;
+  }
+  .stat-help:hover, .stat-help:focus-visible, .stat-help[aria-expanded="true"] {
+    color: var(--text); border-color: rgba(183,53,47,.34);
+    background: rgba(183,53,47,.09);
+  }
+  .stat-bar { height: 6px; background: rgba(49,33,23,.08); border-radius: 4px; overflow: hidden; }
+  .stat-fill { height: 100%; background: rgba(49,33,23,.22); border-radius: 4px; }
   .stat-row.active .stat-fill { background: linear-gradient(90deg, #c8788c, #e8a8b8); }
-  .stat-val { flex: 0 0 26px; text-align: right; font-size: .78rem; color: var(--text-dim); font-family: 'Space Mono', monospace; }
+  .stat-val { text-align: right; font-size: .78rem; color: var(--text-dim); font-family: 'Space Mono', monospace; }
   .stat-row.active .stat-val { color: var(--text); }
+  .stat-copy {
+    margin: 8px 0 0 77px; font-size: .76rem; line-height: 1.55;
+    color: var(--text-dimmer); animation: fadeUp .15s ease both;
+  }
 
-  .charsel-foot { display: flex; justify-content: space-between; margin: 0 2px 14px; font-size: .8rem; color: var(--text-dim); }
-  .charsel-eye b, .charsel-cost { letter-spacing: .03em; }
-  .charsel-eye b.good { color: #8fd0a8; }
-
+  .charsel-actions { display: flex; justify-content: flex-end; margin-top: 6px; }
   .charsel-btn {
     width: 100%; padding: 11px; border: 1px solid rgba(200,120,140,.4);
     background: rgba(200,120,140,.12); color: #e8a8b8; border-radius: 10px;
     font-size: .92rem; letter-spacing: .04em; cursor: pointer; transition: background .2s;
     font-family: inherit;
   }
-  .charsel-card:hover .charsel-btn { background: rgba(200,120,140,.22); }
+  .charsel-btn:hover { background: rgba(200,120,140,.22); }
 
   /* 池子：換一個人生（重置） */
   .pool-reset { margin-top: 14px; text-align: center; }
@@ -128,18 +198,6 @@
     100% { opacity: 0; transform: translateY(8px) scale(.94); filter: blur(1.5px); }
   }
 
-  /* 屬性說明 tooltip（選角畫面 stat-row 滑鼠移過去顯示）*/
-  .stat-row[data-tip] { position: relative; cursor: default; }
-  .stat-row[data-tip]:hover::after {
-    content: attr(data-tip);
-    position: absolute; left: 0; bottom: calc(100% + 5px);
-    background: rgba(20,16,26,.97); border: 1px solid rgba(200,120,140,.28);
-    color: var(--text-dim); font-size: .74rem; line-height: 1.55;
-    padding: 7px 11px; border-radius: 8px; width: 218px;
-    white-space: normal; pointer-events: none; z-index: 20;
-    animation: fadeUp .15s ease both;
-  }
-
   /* 測試模式（只在網址帶 ?debug 時出現；朋友看不到） */
   #dbgToggle {
     position: fixed; bottom: 14px; right: 14px; z-index: 50;
@@ -171,8 +229,8 @@
 <div class="title-screen" id="titleScreen" onclick="anthStart()">
   <div class="title-accent"></div>
   <div class="title-line t1">Red Flags — 選集</div>
-  <div class="title-line t2">池子裡什麼人都有。</div>
-  <div class="title-line t3">有些人是來戀愛的。<br>有些人是來上班的。<br>祝妳好運。</div>
+  <div class="title-line t2">今晚你會為誰心動？</div>
+  <div class="title-line t3">有人會讓你想靠近。<br>有人會讓你覺得為了他改變也可以。<br>那一刻你會怎麼選？</div>
   <div class="title-line t4">點擊任意處開始</div>
 </div>
 
@@ -180,9 +238,11 @@
 
   <!-- 選角（人生只有一次：進池子前先決定你帶著什麼資源走進去） -->
   <section class="char-select" id="charSelect">
+    <button class="charsel-back" type="button" onclick="returnToTitle()">← 回到開場</button>
     <div class="charsel-head">
-      <div class="charsel-title">這一遍人生，你是誰？</div>
-      <div class="charsel-sub">池子裡的人對誰都一樣。<br>差別在你帶著什麼走進去——看得到的、走得掉的，都不同。</div>
+      <div class="charsel-title">先選一個你</div>
+      <div class="charsel-sub">同一句晚安，<br>有人會笑出來，有人會盯著手機很久。<br>今晚你會帶著什麼去見他？</div>
+      <div class="charsel-hintline">點一張看看，再決定要不要赴約</div>
     </div>
     <div class="charsel-cards" id="charCards"></div>
   </section>
@@ -190,7 +250,7 @@
   <!-- 池子（選單即遊戲） -->
   <section class="pool" id="poolScreen">
     <div class="pool-header">
-      <div class="pool-title">今晚的池子</div>
+      <div class="pool-title">今晚會遇到的人</div>
       <div class="pool-sub">滑到誰，就是誰的故事。</div>
     </div>
     <div class="pool-cards" id="poolCards"></div>
@@ -235,7 +295,7 @@
 <button id="dbgToggle" onclick="toggleDebug()">🛠 測試</button>
 <div id="dbgPanel"></div>
 
-<script src="../js/anthology/pilot-characters.js"></script>
+<script src="../js/anthology/player-archetypes.js"></script>
 <script src="../js/anthology/sebastian.js"></script>
 <script src="../js/anthology/daniel.js"></script>
 <script src="../js/anthology/julian.js"></script>

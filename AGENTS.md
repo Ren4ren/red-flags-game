@@ -2,6 +2,21 @@
 
 每次開始工作前請先讀這份文件。
 
+## Context Loading / 讀取策略
+
+Codex 不需要每次把整個 TOE 企劃資料夾都讀進來。新對話先用 `CODEX_HANDOFF.md` 當短版路由器：確認目前入口、git 狀態、最新開發日誌，以及本次任務該追哪一類文件。
+
+預設只讀：
+- 本檔
+- `CODEX_HANDOFF.md`
+- `開發日誌 DEVLOG.md` 最新一條
+
+只有在任務需要時才追讀：
+- `RFD 現況總覽 v1.1.md`：設計方向、文件整理、專案狀態
+- 視覺文件：UI、片頭、motion、city-pop 風格判斷
+- 系統規格：SA、壓力、資源、選集機制
+- 創作理念／製作想法日誌：核心立場、文風、倫理、敏感題材
+
 ## ⚠️ 開場必做
 
 每次新對話開始，**依序做以下三件事**：
@@ -15,17 +30,29 @@
 
 > 「💡 **PM 觀察：** [根據日誌現況給出的具體建議，例如：某個待決定的設計拖太久了、某個區塊可以趁熱推進]」
 
-**第三步：顯示工作選單**，讓用戶選擇今天要做什麼：
+**第三步：顯示工作選單**，讓用戶選擇今天要用哪種方式推進 RFD。
+選單是給 Ren 的低負擔入口；AI 背後可用一人 indie game team 的職位視角切換狀態（編劇、系統設計、美術 / UI、工程、PM / 製作人、行銷測試），但不要把整排職稱丟給 Ren 選。
 
 ```
-今天要做什麼？
+今天想怎麼推進 RFD？
 
-1. 繼續寫故事內容
-2. 討論設計問題
-3. 修改程式
-4. 查看某個系統 / 企劃文件
-5. 更新製作想法日誌
-6. 其他（直接說）
+1. 做內容
+   寫故事、改對白、角色互動、結局、中文文風
+
+2. 做系統
+   沙盒角色、親密腳本、關係成因鏈、SA / 玩家選擇規則
+
+3. 做視覺
+   UI、片頭、選單、profile card、宣傳影片感
+
+4. 做技術 / 發布
+   HTML / CSS / JS、英文版同步、bug、GitHub Pages / playtest
+
+5. 做整理 / 決策
+   下一步、企劃文件、製作想法日誌、成果收斂
+
+6. 其他
+   直接說
 ```
 
 **第四步：用戶選完後，問一句「想做什麼？」**，根據回答判斷是否建議切換模型。
@@ -49,15 +76,25 @@
 這是一個互動故事遊戲，網頁形式（HTML + CSS + JS）。
 作者是動畫師，不是程式設計師，請以非技術性語言溝通。
 
+**目前有兩條線：**
+- **主線＝諷刺選集**：第一人稱滑卡約會，配對池裡有人類掠食者原型，也有正常人，玩家自己分辨。這是目前主要開發線。
+- **Chloe 篇＝旁觀者零回饋實驗**：已收尾，保留為分支參考，不是目前主開發線。
+
 **主要檔案：**（2026-06-21 整理：根目錄只留 `index.html`，其餘頁面收進 `pages/`，子頁 css/js 路徑用 `../`）
-- `index.html` — 根目錄唯一 HTML，入口選單頁（連到選集／Chloe／主線試點）
+- `index.html` — 根目錄唯一 HTML，入口選單頁（目前公開入口只連到選集／Chloe）
 - `pages/anthology.html` — 諷刺選集（主線）入口
+- `css/anthology.css` — 主線選集樣式（疊在 `css/style.css` 上）
+- `js/anthology/player-archetypes.js` — 玩家起始人生／資源資料
+- `js/anthology/engine.js` — 主線選集引擎（池子即選單、持久化資源、傷痕特質、識人之眼）
+- `js/anthology/sebastian.js`、`daniel.js`、`julian.js` — 主線各篇內容
 - `pages/chloe.html` — Chloe 篇主頁面（原 index.html）
-- `pages/julian-pilot.html` — 主線試點（開發中；引擎在 `js/anthology/pilot-engine.js`、角色在 `pilot-characters.js`）
-- `css/style.css` — 視覺樣式
-- `js/engine.js` — 遊戲引擎邏輯（SA 系統、結局、渲染）
+- `css/style.css` — 共用視覺樣式
+- `js/engine.js` — Chloe 引擎（SA 系統、結局、渲染）
 - `js/stories/chloe.js` — Chloe 的故事內容（對話、選項、結局）
 - `js/cases.js` — 結局頁面的參考案例資料庫
+
+**已退役：**
+- Julian 的主線試點頁與試點引擎已完成任務，機制已併回主線選集；不要再把它當成目前入口或維護目標。
 
 **新增角色：** 作者會填《選集 角色設定卡 模板 v1》（在企劃資料夾），請照 `docs/新增角色-轉檔指南.md` 把它轉成角色檔並接進遊戲。
 
@@ -81,16 +118,18 @@ C:\Users\suffi\OneDrive\Apps\remotely-save\TOE\Project - Red Flag Dating\開發�
 
 ## 目前設計決策（重要）
 
-**SA 系統**
-- SA（自我察覺）是 Chloe 看見自己的能力，0–100
-- 遊戲進行中**不顯示** SA 數值或任何回饋
-- 只在結局畫面揭露（側欄 `.timeline.revealed`）
-- SA delta toast（閃現提示）目前狀態：**待決定是否移除**
+**主線選集（目前實作）**
+- 玩家先選一種人生／起始資源，再進同一個配對池。
+- `資源 → 壓力反應 → 傷痕特質 → 下一篇選擇感` 會跨篇持續，不是單篇重置。
+- 有 `lens` 的篇目前會顯示角色條與可見壓力條；角色條內含「識人之眼」與「說出口 SA」。
+- `說出口 SA` 是主線裡「自信＋邊界感」的合成讀數，用來決定有些抵抗型選項的勝算。
+- 壓力過線後會先演出爆發，再把內在資源往下削，影響後續篇章。
 
-**側欄設計**
-- 遊戲中隱藏（`.timeline` 預設 `display:none`）
-- 結局時才顯示（加上 `.revealed` class）
-- 設計理念：側欄是「事後的回頭看」，不是即時追蹤器
+**Chloe 篇（已收尾分支）**
+- SA（自我察覺）是 Chloe 看見自己的能力，0–100。
+- 遊戲進行中不顯示 SA 數值或任何即時回饋。
+- 只在結局畫面揭露（側欄 `.timeline.revealed`）。
+- 側欄設計理念是「事後的回頭看」，不是即時追蹤器。
 
 **語言**
 - 全介面繁體中文
@@ -104,7 +143,47 @@ C:\Users\suffi\OneDrive\Apps\remotely-save\TOE\Project - Red Flag Dating\開發�
 C:\Users\suffi\OneDrive\Apps\remotely-save\TOE\Project - Red Flag Dating\
 ```
 
-最新版企劃：`Red Flags Dating 遊戲企劃 v0.50.md`
+目前現況基準：企劃資料夾的 `RFD 現況總覽 v1.1.md`。
+
+注意：`Red Flags Dating 遊戲企劃 v0.50.md` 已移入 `archieve/`，是遠期願景／靈感庫，不是目前主規格。現行規格與文件地圖以 `RFD 現況總覽 v1.1.md` 為準。
+
+## Video / Brag Workflow（Hyperframes）
+
+Ren 要做 RFD 的 launch video、trailer、promo clip、`/brag` 風格短片，或提到 Hyperframes 時，優先使用 Hyperframes workflow。
+
+**安全規則：**
+- 不要直接讓 Hyperframes 或任何外部影片工具掃描整個 Obsidian vault、Ren vault、或含私密資料的資料夾。
+- 先建立乾淨的 public demo sandbox，只放影片需要的公開遊戲檔、素材、文案。
+- 不要放入私密企劃筆記、聊天紀錄、健康 / 財務資料、API key、`.env`、未公開敏感內容。
+
+**標準流程：**
+1. 先寫 `brag-plan.md`：影片角度、分鏡、必要文案、節奏。
+2. 再寫 `composition-brief.md`：給 Hyperframes 的明確素材與構圖要求。
+3. 用 Hyperframes 建 HTML composition。
+4. 依序跑 `npx hyperframes lint`、`npx hyperframes preview`、確認後再 `npx hyperframes render`。
+5. 若環境缺 FFmpeg / Node / Chrome，先回報阻礙，不要硬裝到私密專案裡。
+
+**目前環境備註（2026-06-24）：**
+- 已安裝 Hyperframes skills，正本在 `C:\Users\suffi\.agents\bullpen\`，Claude / Codex / project `.agents\skills` 以 junction 指向正本。
+- 系統 Node.js LTS 為 v24.18.0；Hyperframes CLI 可用：`npx hyperframes --version` → 0.7.4。
+- FFmpeg 8.1.1 已由 winget 安裝，`npx hyperframes doctor` 顯示 Node / FFmpeg / FFprobe / Chrome 通過。
+- Docker 與 whisper-cpp 未裝，屬選配；不影響一般本地 preview / render。
+
+---
+
+## Browser / Playtest Workflow
+
+Ren 要 Codex / Claude Code 測 RFD 頁面、像玩家一樣走分支、亂點、截圖、檢查 UI 或回報互動問題時，優先考慮 `agent-browser`。
+
+**工具選擇：**
+- `agent-browser`：用於探索式 playtest。適合原型階段快速打開本機 RFD、點選項、走分支、截圖、檢查畫面與互動是否壞掉。
+- Playwright / Playwright MCP：用於穩定後的正式回歸測試。適合把固定路線寫成可重複測試，例如每次改版都自動確認某條流程能到結局。
+- 一般瀏覽器 / 手動檢查：用於單次視覺確認、localhost 是否啟動、或工具尚未安裝時的低成本檢查。
+
+**安全規則：**
+- 不要讓 browser automation 工具掃描 Obsidian vault、Ren vault、私人登入頁、API key、`.env`、健康 / 財務資料或未公開敏感內容。
+- 測 RFD 時只開本機遊戲頁、公開 demo、GitHub Pages、itch.io playtest 或乾淨 sandbox。
+- 安裝或啟用新瀏覽器工具前，先向 Ren 說明用途與風險；不要把工具直接加進專案依賴，除非 Ren 明確同意。
 
 ---
 
@@ -134,8 +213,13 @@ C:\Users\suffi\OneDrive\Apps\remotely-save\TOE\Project - Red Flag Dating\製作�
 
 ## Git 工作方式
 
-目前在 worktree：`C:\AI\red-flags-game\.Codex\worktrees\sweet-cray`
-分支：`Codex/sweet-cray`
-主分支：`main`
+不要信任文件裡的舊 worktree / 分支名稱；每次開始前先用下面指令確認目前實際狀態：
+
+```powershell
+git -c safe.directory=C:/AI/red-flags-game status --short --branch
+git -c safe.directory=C:/AI/red-flags-game branch --show-current
+```
+
+目前主要開發目標仍以 `main` 為基準；歷史 worktree / 分支如 `claude/sweet-cray`、`claude/anthology-mvp`、`Codex/sweet-cray` 只當作上下文線索，不要直接當成當前工作區。
 
 每次 commit 前確認有更新開發日誌。
