@@ -223,3 +223,9 @@ git -c safe.directory=C:/AI/red-flags-game branch --show-current
 目前主要開發目標仍以 `main` 為基準；歷史 worktree / 分支如 `claude/sweet-cray`、`claude/anthology-mvp`、`Codex/sweet-cray` 只當作上下文線索，不要直接當成當前工作區。
 
 每次 commit 前確認有更新開發日誌。
+
+## GitHub / RFD Active 同步規則
+
+- GitHub 是程式碼與 repo 文件的交接來源；重要程式變更完成後，確認已依 Ren 的授權 commit / push，並核對遠端版本是否包含最新現況。
+- Google Drive 的 `RFD Active` 是網頁版 ChatGPT 使用的企劃與日誌來源；現況總覽、開發日誌、製作想法日誌、系統規格或視覺企劃有重要修改時，同步更新對應檔案。
+- 若當下無法完成 GitHub 或 `RFD Active` 同步，回覆結束前必須明確列出尚待更新的來源與檔案，不可默默留下過期版本。

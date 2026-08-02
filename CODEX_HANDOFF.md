@@ -26,6 +26,12 @@ Task-based routing:
 - Technical / release / playtest: stay mostly in repo files, then update the external devlog when done. For build, publishing, copy protection, analytics, or questionnaire planning, read `RFD 技術發布與玩家數據待討論備忘錄 v0.1.md`; it is not a finalized roadmap.
 - Cleanup / planning: read `RFD 現況總覽 v1.2.md` and only the directly relevant folder map entries.
 
+## Web / GitHub / Drive Handoff Rule
+
+- GitHub is the code and repo-document handoff source. After important code changes, commit and push only with Ren's authorization, then verify the remote contains the intended current state.
+- Google Drive `RFD Active` is the planning and log source used by the ChatGPT web Project. When the overview, DEVLOG, production-thought log, system specs, or visual plans change materially, update the matching Drive copy.
+- If either sync cannot be completed in the current session, explicitly list the pending source and files before ending the reply.
+
 ## Current Phase
 
 Playable anthology development plus visual-first validation of the next relationship-event system.
