@@ -12,7 +12,7 @@ Codex 不需要每次把整個 TOE 企劃資料夾都讀進來。新對話先用
 - `開發日誌 DEVLOG.md` 最新一條
 
 只有在任務需要時才追讀：
-- `RFD 現況總覽 v1.1.md`：設計方向、文件整理、專案狀態
+- `RFD 現況總覽 v1.2.md`：設計方向、文件整理、專案狀態
 - 視覺文件：UI、片頭、motion、city-pop 風格判斷
 - 系統規格：SA、壓力、資源、選集機制
 - 創作理念／製作想法日誌：核心立場、文風、倫理、敏感題材
@@ -143,9 +143,9 @@ C:\Users\suffi\OneDrive\Apps\remotely-save\TOE\Project - Red Flag Dating\開發�
 C:\Users\suffi\OneDrive\Apps\remotely-save\TOE\Project - Red Flag Dating\
 ```
 
-目前現況基準：企劃資料夾的 `RFD 現況總覽 v1.1.md`。
+目前現況基準：企劃資料夾的 `RFD 現況總覽 v1.2.md`。
 
-注意：`Red Flags Dating 遊戲企劃 v0.50.md` 已移入 `archieve/`，是遠期願景／靈感庫，不是目前主規格。現行規格與文件地圖以 `RFD 現況總覽 v1.1.md` 為準。
+注意：`Red Flags Dating 遊戲企劃 v0.50.md` 已移入 `archieve/`，是遠期願景／靈感庫，不是目前主規格。現行規格與文件地圖以 `RFD 現況總覽 v1.2.md` 為準。
 
 ## Video / Brag Workflow（Hyperframes）
 
