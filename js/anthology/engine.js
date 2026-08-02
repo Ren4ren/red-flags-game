@@ -66,6 +66,7 @@ function clingTier(v) { return v >= 60 ? 'high' : (v >= 38 ? 'mid' : 'low'); }
 let ep = null;
 let beatIdx = 0;
 let flags = new Set();
+let memories = new Set();
 let pendingEnd = null;
 let currentChoices = null;
 // 機制（只在 ep.lens 篇用）：壓力為單篇變數、爆發削的資源寫回 state.resources（持久化）
@@ -321,9 +322,13 @@ function skipProfile(id) {
 
 // ── 故事進行 ──
 let renderTimers = [];
+let activePlayback = null;
+let playbackSerial = 0;
 function schedule(fn, ms) { renderTimers.push(setTimeout(fn, ms)); }
 function clearRenderTimers() {
   renderTimers.forEach(clearTimeout); renderTimers = [];
+  activePlayback = null;
+  document.querySelectorAll('.typing-indicator').forEach(el => el.remove());
   if (diceIv) { clearInterval(diceIv); diceIv = null; }
 }
 
@@ -331,6 +336,7 @@ function startEpisode(id) {
   ep = EPISODES[id];
   beatIdx = 0;
   flags = new Set();
+  memories = new Set();
   pendingEnd = null;
   liveInsight = state.insight;
   document.getElementById('chatAvatar').textContent = ep.avatarText;
@@ -410,6 +416,8 @@ function visibleMessages(list) {
   return list.filter(m => {
     if (m.trait && !hasTrait(m.trait)) return false;
     if (m.skipIfTrait && hasTrait(m.skipIfTrait)) return false;
+    if (m.memory && !memories.has(m.memory)) return false;
+    if (m.skipIfMemory && memories.has(m.skipIfMemory)) return false;
     if (m.minInsight && liveInsight < m.minInsight) return false; // 識人之眼不夠，看不見這條線索
     return true;
   });
@@ -464,60 +472,106 @@ function scrollMsgs() {
   msgs.scrollTop = msgs.scrollHeight;
 }
 
-// 逐則播放（沿用 Chloe 的節奏邏輯：打字時間與閱讀時間依字數）
+const MESSAGE_PACE = {
+  normal: { note: 675, typeMin: 600, typeMax: 1800, typePerChar: 34, readMin: 375, readMax: 1200, readPerChar: 21 },
+  fast: { note: 450, typeMin: 380, typeMax: 1050, typePerChar: 23, readMin: 260, readMax: 675, readPerChar: 14 },
+};
+
+function appendMessageItem(container, m) {
+  if (m.note !== undefined) { breakHimGroup(container); appendNote(container, m.note); }
+  else if (m.inner !== undefined) { breakHimGroup(container); appendInner(container, m.inner); }
+  else appendHim(container, m);
+}
+
+function finishPlayback(playback) {
+  if (!playback || activePlayback !== playback || playback.finished) return;
+  playback.finished = true;
+  activePlayback = null;
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.textContent = '繼續 →';
+  nextBtn.disabled = true;
+  playback.onDone();
+}
+
+function revealAllMessages() {
+  const playback = activePlayback;
+  if (!playback || playback.finished) return;
+  renderTimers.forEach(clearTimeout); renderTimers = [];
+  playback.container.querySelectorAll('.typing-indicator').forEach(el => el.remove());
+  playback.items.forEach((m, i) => {
+    if (playback.shown.has(i)) return;
+    playback.shown.add(i);
+    appendMessageItem(playback.container, m);
+  });
+  scrollMsgs();
+  finishPlayback(playback);
+}
+
+// 逐則播放：保留聊天呼吸，也允許玩家用「顯示全部」跳過等待。
 function playMessages(list, startDelay, onDone, fast) {
   const msgs = document.getElementById('messages');
+  const items = visibleMessages(list);
   if (DEBUG.instant) { // 測試：瞬間出全部訊息，不打字、不延遲
-    visibleMessages(list).forEach(m => {
-      if (m.note !== undefined) { breakHimGroup(msgs); appendNote(msgs, m.note); }
-      else if (m.inner !== undefined) { breakHimGroup(msgs); appendInner(msgs, m.inner); }
-      else { appendHim(msgs, m); }
-    });
+    items.forEach(m => appendMessageItem(msgs, m));
     scrollMsgs();
     schedule(onDone, 10);
     return;
   }
+  const pace = fast ? MESSAGE_PACE.fast : MESSAGE_PACE.normal;
+  const playback = {
+    id: ++playbackSerial,
+    container: msgs,
+    items,
+    shown: new Set(),
+    onDone,
+    finished: false,
+  };
+  activePlayback = playback;
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.textContent = '顯示全部 ↓';
+  nextBtn.disabled = false;
   let delay = startDelay;
-  visibleMessages(list).forEach((m, i) => {
+  items.forEach((m, i) => {
     if (m.note !== undefined || m.inner !== undefined) {
       schedule(() => {
-        breakHimGroup(msgs);
-        if (m.note !== undefined) appendNote(msgs, m.note); else appendInner(msgs, m.inner);
+        if (activePlayback !== playback || playback.shown.has(i)) return;
+        playback.shown.add(i);
+        appendMessageItem(msgs, m);
         scrollMsgs();
       }, delay);
-      delay += fast ? 600 : 900;
+      delay += pace.note;
       return;
     }
-    const typeTime = fast
-      ? Math.min(1400, Math.max(500, m.him.length * 30))
-      : Math.min(2400, Math.max(800, m.him.length * 45));
-    const readTime = fast
-      ? Math.min(900, Math.max(350, m.him.length * 18))
-      : Math.min(1600, Math.max(500, m.him.length * 28));
+    const typeTime = Math.min(pace.typeMax, Math.max(pace.typeMin, m.him.length * pace.typePerChar));
+    const readTime = Math.min(pace.readMax, Math.max(pace.readMin, m.him.length * pace.readPerChar));
 
     const tDelay = delay;
+    const indicatorId = `anth-typing-${playback.id}-${i}`;
     schedule(() => {
+      if (activePlayback !== playback || playback.shown.has(i)) return;
       const grpExists = msgs.querySelector('.msg-group.him-last');
       if (!grpExists) appendHimShell(msgs);
       const rows = msgs.querySelector('.msg-group.him-last .bubble-row');
       const ind = document.createElement('div');
       ind.className = 'typing-indicator';
-      ind.id = `anth-typing-${tDelay}`;
+      ind.id = indicatorId;
       ind.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
       rows.appendChild(ind);
       scrollMsgs();
     }, tDelay);
 
     schedule(() => {
-      const ind = document.getElementById(`anth-typing-${tDelay}`);
+      if (activePlayback !== playback || playback.shown.has(i)) return;
+      const ind = document.getElementById(indicatorId);
       if (ind) ind.remove();
-      appendHim(msgs, m);
+      playback.shown.add(i);
+      appendMessageItem(msgs, m);
       scrollMsgs();
     }, tDelay + typeTime);
 
     delay = tDelay + typeTime + readTime;
   });
-  schedule(onDone, delay + 300);
+  schedule(() => finishPlayback(playback), delay + 225);
 }
 
 function appendHimShell(container) {
@@ -570,6 +624,7 @@ function refreshRoleBar() {
 
 function clearChoicesArea() {
   const area = document.getElementById('choicesArea');
+  area.classList.remove('is-visible');
   area.querySelectorAll('.choice-btn').forEach(el => el.remove());
   area.style.display = 'none';
   return area;
@@ -581,7 +636,7 @@ function showChoices(choices) {
   currentChoices = shown;
   const area = clearChoicesArea();
   shown.forEach((c, i) => {
-    const dice = ep.lens && c.flag && ep.lens.dice && ep.lens.dice[c.flag]; // 抵抗型＝說出口擲骰
+    const dice = !c.alwaysSpeak && ep.lens && c.flag && ep.lens.dice && ep.lens.dice[c.flag]; // 舊抵抗型＝說出口擲骰
     const btn = document.createElement('button');
     btn.className = 'choice-btn' + (c.minInsight ? ' insight' : '') + (dice ? ' resist' : '');
     if (dice) {
@@ -594,6 +649,7 @@ function showChoices(choices) {
     area.appendChild(btn);
   });
   area.style.display = 'flex';
+  requestAnimationFrame(() => area.classList.add('is-visible'));
   scrollMsgs();
 }
 
@@ -627,6 +683,7 @@ function resolveExpressive(c, dice) {
     if (success) {
       spoke.wins++;
       flags.add(c.flag);
+      if (c.memory) memories.add(c.memory);
       liveInsight = Math.min(liveInsight + 1, 8);
       appendYouBubble(c.text);
       scrollMsgs();
@@ -634,6 +691,7 @@ function resolveExpressive(c, dice) {
       else schedule(cont, 400);
     } else {
       addStress(STRESS_SWALLOW); // 想抗拒卻吞回去 → 壓力累積
+      if (c.failMemory) memories.add(c.failMemory);
       const bubble = appendYouBubble(c.text); // 話打出來……
       scrollMsgs();
       const d1 = DEBUG.instant ? 10 : 500, d2 = DEBUG.instant ? 10 : 950;
@@ -698,7 +756,7 @@ function rollDice(text, chance, cb) {
 
 function choose(i) {
   const c = currentChoices[i];
-  const dice = ep.lens && c.flag && ep.lens.dice && ep.lens.dice[c.flag];
+  const dice = !c.alwaysSpeak && ep.lens && c.flag && ep.lens.dice && ep.lens.dice[c.flag];
   clearChoicesArea();
   const msgs = document.getElementById('messages');
   breakHimGroup(msgs);
@@ -708,10 +766,11 @@ function choose(i) {
   // 這一拍本來有「抵抗」選項，妳卻選了妥協退讓 → 也是違背自己，累積壓力
   if (ep.lens) {
     const beatHadResist = currentChoices.some(x => ep.lens.dice && x.flag && ep.lens.dice[x.flag]);
-    if (beatHadResist && !c.end && !c.followup && !c.flag) addStress(STRESS_COMPLY);
+    if (beatHadResist && !c.end && !c.followup && !c.flag && !c.noStress) addStress(STRESS_COMPLY);
   }
 
   if (c.flag) { flags.add(c.flag); liveInsight = Math.min(liveInsight + 1, 8); } // 抓到一條線索，眼睛更利一點
+  if (c.memory) memories.add(c.memory);
 
   // 玩家的動作：括號開頭＝行動敘述，否則是訊息泡泡
   if (c.text.startsWith('（')) {
@@ -754,6 +813,7 @@ function choose(i) {
 }
 
 function nextBeat() {
+  if (activePlayback) { revealAllMessages(); return; }
   if (pendingEnd) { finish(pendingEnd); return; }
   if (beatIdx < ep.beats.length - 1) {
     beatIdx++;
@@ -962,6 +1022,7 @@ function renderDebugPanel() {
       獵物價值：${prey !== null ? prey + '（' + clingTier(prey) + '）' : '—'}<br>
       傷痕：${state.traits.join('、') || '（無）'}<br>
       已戳破：${[...flags].join('、') || '（無）'}<br>
+      場景記憶：${[...memories].join('、') || '（無）'}<br>
       說出口：${spoke.tries ? spoke.wins + ' / ' + spoke.tries : '—'}
     </div></div>
     <div class="dbg-sect"><button class="dbg-chip" onclick="dbgWipe()">🗑 清存檔重來</button></div>`;

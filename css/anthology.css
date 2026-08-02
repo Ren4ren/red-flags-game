@@ -89,6 +89,18 @@
 .chat-wrap.visible { display:flex; }
 .msg-sender.him { color:#c4a35a; }
 
+/* 回應區跟著對話自然浮起，不再整塊瞬間切入。 */
+.anth-main .choices {
+  opacity:0;
+  transform:translateY(8px);
+  transition:opacity 220ms cubic-bezier(.25,1,.5,1), transform 220ms cubic-bezier(.25,1,.5,1);
+}
+.anth-main .choices.is-visible { opacity:1; transform:translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  .anth-main .choices { transition:none; transform:none; }
+}
+
 /* 內心獨白 */
 .inner-voice {
   align-self:flex-end; max-width:78%; margin:6px 0 14px;

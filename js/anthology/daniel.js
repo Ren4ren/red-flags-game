@@ -2,6 +2,61 @@
 // 他真的就是個好人，沒有反轉。
 // 本篇的喜劇引擎是玩家自己的疑心病；教學主軸：怪癖≠破綻、辨識看模式。
 
+const DANIEL_JOKE_FOLLOWUP = {
+  reply: [
+    { note: '妳的手機在桌上震了一下。\n「還活著嗎」\n「到家跟我講一聲」\n\n妳拿起手機。他剛好看到第一句。' },
+    { him: '查勤喔', time: '現場' },
+    { him: '那我要不要交一下良民證', time: '現場' },
+  ],
+  choices: [
+    {
+      text: '等一下，她沒收到真的會打來。',
+      memory: 'jokeCheckin',
+      noStress: true,
+      reply: [
+        { him: '喔 好', time: '現場' },
+        { him: '妳先回', time: '現場' },
+        { note: '他把妳的碗往旁邊挪了一點。' },
+        { him: '先不要讓麵吸湯', time: '現場' },
+        { note: '回家後。' },
+        { him: '到家了嗎', time: '晚上10:46' },
+        { him: '妳朋友那邊也記得講', time: '晚上10:46' },
+      ],
+    },
+    {
+      text: '我知道你在開玩笑，可是我不太喜歡這句。',
+      flag: 'jokeBoundary',
+      memory: 'jokeSpoken',
+      alwaysSpeak: true,
+      reply: [
+        { him: '我沒有要……', time: '現場' },
+        { note: '他停了一下。' },
+        { him: '好', time: '現場' },
+        { him: '這句很白目', time: '現場' },
+        { him: '對不起', time: '現場' },
+        { him: '妳先回', time: '現場' },
+        { note: '回家後。' },
+        { him: '欸', time: '晚上10:49' },
+        { him: '剛剛良民證那個', time: '晚上10:49' },
+        { him: '抱歉', time: '晚上10:50' },
+        { him: '下次不講了', time: '晚上10:50' },
+      ],
+    },
+    {
+      text: '她很愛操心啦。',
+      memory: 'jokeSmoothed',
+      reply: [
+        { note: '妳把手機翻了過去。' },
+        { him: '她真的會打喔', time: '現場' },
+        { note: '妳搖頭。他也笑了一下，繼續吃麵。' },
+        { note: '回家後。' },
+        { him: '到家講一聲', time: '晚上10:47' },
+        { him: '不然我良民證白交了', time: '晚上10:47' },
+      ],
+    },
+  ],
+};
+
 const EP_DANIEL = {
   id: 'daniel',
   name: 'Daniel',
@@ -33,6 +88,16 @@ const EP_DANIEL = {
   // 糾纏（clinging）換成 Daniel 的善意告別——同樣的機制，不同的人性。
   lens: {
     dice: {
+      jokeBoundary: {
+        failInner: '妳本來想說「我不喜歡」。\n話到嘴邊，卻只剩一句：「她很愛操心啦。」',
+        failReply: [
+          { note: '妳把手機翻了過去。' },
+          { him: '她真的會打喔', time: '現場' },
+          { note: '回家後。' },
+          { him: '到家講一聲', time: '晚上10:47' },
+          { him: '不然我良民證白交了', time: '晚上10:47' },
+        ],
+      },
       boundary: {
         failInner: '妳打好了「我有點不安」，看著那四個字，還是刪掉了。\n說出來，好像很難。',
         failReply: [
@@ -120,6 +185,7 @@ const EP_DANIEL = {
             { him: '中途之家帶回來的', time: '現場' },
             { him: '本來只打算帶一隻', time: '現場' },
           ],
+          followup: DANIEL_JOKE_FOLLOWUP,
         },
         {
           text: '下次換我挑店。',
@@ -129,6 +195,7 @@ const EP_DANIEL = {
             { him: '……開玩笑的', time: '現場' },
             { him: '妳挑的我都吃', time: '現場' },
           ],
+          followup: DANIEL_JOKE_FOLLOWUP,
         },
         {
           text: '（人很好。但好平淡。妳回家之後，沒有再約。）',
@@ -179,6 +246,9 @@ const EP_DANIEL = {
     {
       status: '第二個月',
       messages: [
+        { note: '第二次見面前，他把店址傳來。\n「妳可以先丟給妳朋友。我七點到。」', memory: 'jokeCheckin' },
+        { note: '第二次見面前，他把店址傳來。\n「妳可以先丟給妳朋友。我七點到。」', memory: 'jokeSpoken' },
+        { note: '第二次見面，他把筷子遞給妳。\n「今天不用良民證了吧。」\n\n妳也笑了。慢了半拍。', memory: 'jokeSmoothed' },
         { note: '他的筆記本掉出一張紙。\n一個不小的存款目標，旁邊一個縮寫。\n妳認得那個縮寫——不是房子，不是車。' },
       ],
       choices: [
@@ -357,7 +427,7 @@ const EP_DANIEL = {
       if (hasTrait('guarded')) {
         return { remove: 'guarded', add: 'trust', text: '傷會好。\n需要時間，和一個好的人。\n「防衛心」從妳的卡片上淡掉了。' };
       }
-      if (hasTrait('silent') && flags.has('boundary')) {
+      if (hasTrait('silent') && (flags.has('boundary') || flags.has('jokeBoundary'))) {
         return { remove: 'silent', add: 'spoken', text: '妳把不安說出口，世界沒有塌。\n「不敢開口」從妳的卡片上淡掉了。' };
       }
       return { add: null, text: '妳的卡片不需要新的字。\n這一次，不需要。' };

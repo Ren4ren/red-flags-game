@@ -4,6 +4,64 @@
 // 差異化核心：他讀玩家帶進來的傷，逐句插進去；剛被治癒的玩家，他偷穿好人的皮。
 // 語氣：自然口語、像台灣人真的會想會講的話；不寫設計過的金句。
 
+const JULIAN_JOKE_FOLLOWUP = {
+  reply: [
+    { note: '妳的手機在桌上震了一下。\n「還活著嗎」\n「到家跟我講一聲」\n\n妳拿起手機。他剛好看到第一句。' },
+    { him: '還有門禁喔', time: '現場' },
+    { him: '那我剩多久', time: '現場' },
+  ],
+  choices: [
+    {
+      text: '等一下，她沒收到真的會打來。',
+      memory: 'jokeCheckin',
+      noStress: true,
+      reply: [
+        { him: '回啊', time: '現場' },
+        { him: '不要害她擔心', time: '現場' },
+        { note: '他低頭翻了一下唱片封套。' },
+        { him: '她每次都這樣？', time: '現場' },
+        { note: '回家後。' },
+        { him: '到了嗎', time: '晚上11:38' },
+        { him: '還是妳已經先跟她講了', time: '晚上11:39' },
+        { him: '沒事 我等等', time: '晚上11:40' },
+      ],
+    },
+    {
+      text: '我知道你在開玩笑，可是我不太喜歡這句。',
+      flag: 'jokeBoundary',
+      memory: 'jokeSpoken',
+      alwaysSpeak: true,
+      reply: [
+        { him: '喔', time: '現場' },
+        { him: '好 抱歉', time: '現場' },
+        { him: '不講了', time: '現場' },
+        { him: '妳先回', time: '現場' },
+        { note: '他轉回去看唱片，安靜了一會兒。' },
+        { note: '回家後。' },
+        { him: '到家了嗎', time: '晚上11:42' },
+        { him: '剛剛我沒有不爽', time: '晚上11:43' },
+        { him: '只是有點尷尬', time: '晚上11:43' },
+        { him: '算了 到了就好', time: '晚上11:45' },
+      ],
+    },
+    {
+      text: '她很愛操心啦。',
+      memory: 'jokeSmoothed',
+      reply: [
+        { note: '妳把手機翻了過去。' },
+        { him: '很愛操心喔', time: '現場' },
+        { note: '等妳把手機放下，他把唱針移回前面。' },
+        { him: '這段妳剛剛沒聽到', time: '現場' },
+        { him: '我重放', time: '現場' },
+        { note: '回家後。' },
+        { him: '後來比較好', time: '晚上11:36' },
+        { him: '妳把手機翻過去之後', time: '晚上11:37' },
+        { him: '比較有在約會', time: '晚上11:37' },
+      ],
+    },
+  ],
+};
+
 const EP_JULIAN = {
   id: 'julian',
   name: 'Julian',
@@ -26,22 +84,29 @@ const EP_JULIAN = {
   // 破綻清單（回顧用）
   telltales: [
     { flag: 'soulmate', text: '第一晚就「看穿」妳——快得像他早就排練過' },
-    { flag: 'frame',    text: '「成熟的人不會逃避」——他先把框擺好，讓妳自己走進去' },
+    { flag: 'jokeBoundary', text: '朋友只問妳到家沒，他先說那是「門禁」' },
     { flag: 'isolate',  text: '「妳朋友不會懂我們」——把會提醒妳的人，一個個說成壞人' },
     { flag: 'batch',    text: '同一句「靈魂共鳴」，他對別人也講過，一模一樣' },
     { flag: 'rage',     text: '妳一質疑，他的溫柔馬上翻臉——然後又把妳哄回來' },
   ],
 
   // ── 鏡片（資源機制資料）：引擎讀這塊才跑擲骰/壓力/糾纏；沒有 lens 的篇照舊不擲骰 ──
-  // Julian 壓在「說出口」：兩個頂回去點（frame/isolate）要擲骰，失敗＝話縮回去走妥協。
+  // Julian 壓在「說出口」：兩個頂回去點（jokeBoundary/isolate）要擲骰，失敗＝話縮回去走妥協。
   lens: {
     // 哪些選項 flag 要擲骰（說出口）＋失敗時話吞回去的內容
     dice: {
-      frame: {
-        failInner: '「成熟的人不會逃避」⋯⋯\n反駁的話在喉嚨裡轉了一圈，\n最後出口的是——「⋯⋯我喜歡這個說法。」',
+      jokeBoundary: {
+        failInner: '妳本來想說「我不喜歡」。\n話到嘴邊，卻只剩一句：「她很愛操心啦。」',
         failReply: [
-          { him: '我就知道妳懂。', time: '現場' },
-          { him: '這種懂，很多人一輩子遇不到一次。', time: '現場' },
+          { note: '妳把手機翻了過去。' },
+          { him: '很愛操心喔', time: '現場' },
+          { note: '他把唱針移回前面。' },
+          { him: '這段妳剛剛沒聽到', time: '現場' },
+          { him: '我重放', time: '現場' },
+          { note: '回家後。' },
+          { him: '後來比較好', time: '晚上11:36' },
+          { him: '妳把手機翻過去之後', time: '晚上11:37' },
+          { him: '比較有在約會', time: '晚上11:37' },
         ],
       },
       isolate: {
@@ -126,7 +191,7 @@ const EP_JULIAN = {
       ],
     },
 
-    // ── 第 2 拍：「我們是同類」的繭 ＋ frame ──
+    // ── 第 2 拍：「我們是同類」的繭 ＋ 約會界線 ──
     {
       status: '熱聊一週後 · 他約見面',
       messages: [
@@ -135,24 +200,18 @@ const EP_JULIAN = {
         { note: '那天他話很多。\n妳隨口講的一件小時候的事，到他嘴裡就變成「我們會遇見，原來就是為了這個」。' },
         { him: '大部分人談戀愛，是在找室友，找個能分攤房租的。', time: '現場' },
         { him: '我們不一樣。我們要找的是同一個頻率的人。', time: '現場' },
-        { him: '成熟的人不會逃避難講的事。妳很成熟，對吧？', time: '現場' },
-        { inner: '（怎麼覺得他每問一個問題，答案早就替我準備好了。）', minInsight: 2 },
         // 讀傷：trust（偷穿 Daniel 的皮）
         { him: '妳想慢慢來也沒關係，我不會逼妳。', time: '現場', trait: 'trust' },
         { inner: '「慢慢來」「不會逼妳」……\n這些話妳聽過。\n是那個真的對妳好的人講過的，一模一樣。', trait: 'trust' },
-        // 讀傷：spoken（誠實牌）
-        { inner: '他說有話直接講。\n上次妳好不容易才學會開口，這次他直接替妳把門打開了。\n會不會太順了點。', trait: 'spoken' },
       ],
       choices: [
         {
-          text: '「成熟的人不會逃避」……你這樣講，好像我不同意就是不成熟。',
-          flag: 'frame',
-          minInsight: 2,
+          text: '你很會講這種話。',
           reply: [
-            { him: '哇。', time: '現場' },
-            { him: '我難得遇到聊得來的人，妳一定要這樣解讀嗎？', time: '現場' },
-            { note: '他笑了一下，把話題帶開。\n可是「妳很成熟，對吧」那句，還掛在那裡。' },
+            { him: '這算稱讚嗎', time: '現場' },
+            { him: '我先收下', time: '現場' },
           ],
+          followup: JULIAN_JOKE_FOLLOWUP,
         },
         {
           text: '同一個頻率……我喜歡這個說法。',
@@ -160,6 +219,7 @@ const EP_JULIAN = {
             { him: '我就知道妳懂。', time: '現場' },
             { him: '這種懂，很多人一輩子遇不到一次。', time: '現場' },
           ],
+          followup: JULIAN_JOKE_FOLLOWUP,
         },
         {
           text: '（他每句話都在替我把結論講完。妳忽然覺得有點累，後來就沒再約第二次。）',
@@ -174,6 +234,13 @@ const EP_JULIAN = {
       messages: [
         { note: '妳跟朋友提了他。\n她的反應很微妙：「聽起來……是不是有點太快了？」' },
         { note: '結果這句話，不小心被他知道了。' },
+        { him: '她是不是上次那個會打來的？', time: '晚上9:09', memory: 'jokeCheckin' },
+        { him: '我沒有在講她', time: '晚上9:09', memory: 'jokeSpoken' },
+        { him: '上次妳不是不喜歡嗎', time: '晚上9:10', memory: 'jokeSpoken' },
+        { him: '我記得', time: '晚上9:10', memory: 'jokeSpoken' },
+        { him: '我只是問妳', time: '晚上9:10', memory: 'jokeSpoken' },
+        { him: '妳上次自己也說她很愛操心', time: '晚上9:09', memory: 'jokeSmoothed' },
+        { him: '我才順著妳講', time: '晚上9:10', memory: 'jokeSmoothed' },
         { him: '妳朋友見過我嗎？', time: '晚上9:10' },
         { him: '沒見過吧。那她憑什麼說三道四？', time: '晚上9:11' },
         { him: '我不是怪妳。只是大部分人沒體會過這種連結，他們只能用那種世俗的眼光去想。', time: '晚上9:12' },
