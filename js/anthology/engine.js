@@ -709,7 +709,7 @@ function resolveExpressive(c, dice) {
   });
 }
 
-// 擲骰動畫（模式 A：看得到勝算、看得到骰子落點）
+// 擲骰動畫（模式 B：CK3 式敘事優先，隱藏原始骰值，只顯示機率與結果）
 function rollDice(text, chance, cb) {
   const msgs = document.getElementById('messages');
   const panel = document.createElement('div');
@@ -719,22 +719,18 @@ function rollDice(text, chance, cb) {
     <div class="dice-say"></div>
     <div class="dice-meter">
       <span class="dice-odds">勝算 ${chance}%</span>
-      <span class="dice-roll" id="diceRoll">··</span>
     </div>
-    <div class="dice-result" id="diceResult">擲骰中⋯</div>`;
+    <div class="dice-result" id="diceResult">正在判斷⋯</div>`;
   panel.querySelector('.dice-say').textContent = text;
   msgs.appendChild(panel);
   scrollMsgs();
-  const rollEl = panel.querySelector('#diceRoll');
   const resEl = panel.querySelector('#diceResult');
-  let success, final;
-  if (DEBUG.force === 'win')  { success = true;  final = Math.floor(Math.random() * chance); }
-  else if (DEBUG.force === 'lose') { success = false; final = chance + Math.floor(Math.random() * (100 - chance)); }
-  else { final = Math.floor(Math.random() * 100); success = final < chance; } // 0–99，越低越容易成功
+  let success;
+  if (DEBUG.force === 'win')  { success = true; }
+  else if (DEBUG.force === 'lose') { success = false; }
+  else { success = Math.floor(Math.random() * 100) < chance; }
 
   const settle = () => {
-    rollEl.textContent = final;
-    rollEl.classList.add(success ? 'ok' : 'no');
     resEl.textContent = success ? '✓ 妳說出口了' : '✗ 話又吞了回去';
     resEl.className = 'dice-result ' + (success ? 'ok' : 'no');
     scrollMsgs();
@@ -745,13 +741,14 @@ function rollDice(text, chance, cb) {
   let ticks = 0;
   if (diceIv) clearInterval(diceIv);
   diceIv = setInterval(() => {
-    rollEl.textContent = Math.floor(Math.random() * 100);
-    if (++ticks > 14) {
+    const dots = ['⋯', '·⋯', '··⋯', '···'][ticks % 4];
+    resEl.textContent = '正在判斷' + dots;
+    if (++ticks > 12) {
       clearInterval(diceIv); diceIv = null;
       settle();
       schedule(() => cb(success), 950);
     }
-  }, 70);
+  }, 100);
 }
 
 function choose(i) {
@@ -959,6 +956,11 @@ function toggleDebug() {
   const p = document.getElementById('dbgPanel');
   if (p.classList.toggle('open')) renderDebugPanel();
 }
+// 確保 ?debug 參數能解鎖測試按鈕
+window.addEventListener('DOMContentLoaded', () => {
+  const t = document.getElementById('dbgToggle');
+  if (t && /[?&]debug/.test(location.search)) t.style.display = '';
+});
 function dbgInstant(on) { DEBUG.instant = on; renderDebugPanel(); }
 function dbgForce(mode) { DEBUG.force = mode; renderDebugPanel(); }
 function dbgArchetype(id) {
@@ -1035,3 +1037,4 @@ function renderDebugPanel() {
   if (t && !/[?&]debug/.test(location.search)) t.style.display = 'none';
 })();
 show('pool');
+

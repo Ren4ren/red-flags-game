@@ -589,22 +589,18 @@ function rollDice(text, chance, cb) {
     <div class="dice-say"></div>
     <div class="dice-meter">
       <span class="dice-odds">${chance}% odds</span>
-      <span class="dice-roll" id="diceRoll">··</span>
     </div>
-    <div class="dice-result" id="diceResult">rolling…</div>`;
+    <div class="dice-result" id="diceResult">Judging…</div>`;
   panel.querySelector('.dice-say').textContent = text;
   msgs.appendChild(panel);
   scrollMsgs();
-  const rollEl = panel.querySelector('#diceRoll');
   const resEl = panel.querySelector('#diceResult');
-  let success, final;
-  if (DEBUG.force === 'win')  { success = true;  final = Math.floor(Math.random() * chance); }
-  else if (DEBUG.force === 'lose') { success = false; final = chance + Math.floor(Math.random() * (100 - chance)); }
-  else { final = Math.floor(Math.random() * 100); success = final < chance; }
+  let success;
+  if (DEBUG.force === 'win')  { success = true; }
+  else if (DEBUG.force === 'lose') { success = false; }
+  else { success = Math.floor(Math.random() * 100) < chance; }
 
   const settle = () => {
-    rollEl.textContent = final;
-    rollEl.classList.add(success ? 'ok' : 'no');
     resEl.textContent = success ? '✓ You said it' : '✗ The words slipped back down';
     resEl.className = 'dice-result ' + (success ? 'ok' : 'no');
     scrollMsgs();
@@ -615,13 +611,14 @@ function rollDice(text, chance, cb) {
   let ticks = 0;
   if (diceIv) clearInterval(diceIv);
   diceIv = setInterval(() => {
-    rollEl.textContent = Math.floor(Math.random() * 100);
-    if (++ticks > 14) {
+    const dots = ['…', '.…', '..…', '...'][ticks % 4];
+    resEl.textContent = 'Judging' + dots;
+    if (++ticks > 12) {
       clearInterval(diceIv); diceIv = null;
       settle();
       schedule(() => cb(success), 950);
     }
-  }, 70);
+  }, 100);
 }
 
 function choose(i) {
