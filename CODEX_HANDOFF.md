@@ -1,10 +1,11 @@
 # RFD Codex Handoff
 
-Last checked: 2026-07-31
+Last checked: 2026-10-04
 
 ## Current Goal
 
 Keep the Red Flag Dating repo easy to resume without mistaking old experiments for the active path.
+**2026-10-04 Milestone:** The previous Visual Novel style Anthology prototype (`pages/anthology.html`) and Chloe branch have been frozen and tagged as `archive-v0.8-vn-anthology`. The project is pivoting from linear dialogue scriptwriting toward an Emergent Narrative Simulator (inspired by RimWorld, CK3, and Free Cities: state machines, weighted event decks, and minimalist action logs leaving room for player imagination).
 
 ## Minimal Startup Reads
 
@@ -21,9 +22,9 @@ At the start of a Codex session:
 Task-based routing:
 
 - Content / story / dialogue: read `RFD 文風與倫理守則 v0.1.md`, relevant character cards, and branch maps.
-- System / rules / resources / events: start with `RFD 全面系統圖 v0.1.canvas` and `界線事件與角色反應系統 v0.1.md`. Read `主線系統 — 對話執行 × 壓力 × SA v0.1.md` and `選集 屬性判定系統 v0.1.md` only when checking how the current prototype still works.
+- System / rules / resources / events: start with `RFD 全面系統圖 v0.1.canvas` and `界線事件與角色反應系統 v0.1.md`.
 - Visual / UI / opening / motion: read `RFD 視覺方向 v0.1.md`; read `RFD city pop 與東亞都市情感記憶備忘錄 v0.1.md` only when judging style philosophy, not for every CSS tweak.
-- Technical / release / playtest: stay mostly in repo files, then update the external devlog when done. For build, publishing, copy protection, analytics, or questionnaire planning, read `RFD 技術發布與玩家數據待討論備忘錄 v0.1.md`; it is not a finalized roadmap.
+- Technical / release / playtest: stay mostly in repo files, then update the external devlog when done.
 - Cleanup / planning: read `RFD 現況總覽 v1.2.md` and only the directly relevant folder map entries.
 
 ## Web / GitHub / Drive Handoff Rule
@@ -34,20 +35,17 @@ Task-based routing:
 
 ## Current Phase
 
-Playable anthology development plus visual-first validation of the next relationship-event system.
+Transition from Visual Novel Anthology to Emergent Story Simulator.
 
-The playable main line is the first-person anthology in `pages/anthology.html`. Daniel and Julian now contain the first "awkward joke after a friend checks safety" content slice plus small per-episode scene memories. In this one validated boundary choice, player intent now always executes instead of rolling SA; the rest of the anthology still uses the older SA prototype. Chloe is a finished side experiment in `pages/chloe.html`. The old Julian pilot has been retired.
-
-Collaboration mode for the current system work is visual-first: use the Canvas as the shared whiteboard, keep chat explanations compact, and move confirmed rules and rationale into Markdown only after the connections make sense visually.
+The existing anthology in `pages/anthology.html` and Chloe in `pages/chloe.html` are preserved as frozen reference prototypes (tagged `archive-v0.8-vn-anthology`). `playtest-en/` has been removed.
+Collaboration mode is visual-first and state-driven: use `RFD 全面系統圖 v0.1.canvas` as the system whiteboard to define character scripts, weighted event decks, boundary reactions, and resource erosion.
 
 ## Current Repo State
 
 - Working directory: `C:\AI\red-flags-game`
 - Main baseline: `main`
-- Last observed git state on 2026-07-31: `main...origin/main [ahead 3]`
-- Existing modified files: `AGENTS.md`, `CLAUDE.md`, `CODEX_HANDOFF.md`, `js/anthology/daniel.js`, `js/anthology/engine.js`, `js/anthology/julian.js`
-- Existing unrelated untracked local file: `.claude/settings.local.json`
-- The uncommitted Daniel / Julian / engine changes include the completed 2026-07-30 trial slice and its 2026-07-31 playtest fixes. Preserve and inspect them; do not discard them as incidental dirty-worktree changes.
+- Tag: `archive-v0.8-vn-anthology` points to commit `7ce2eaf`
+- Uncommitted change: deleted `playtest-en/`
 
 Always refresh with:
 
@@ -59,9 +57,8 @@ git -c safe.directory=C:/AI/red-flags-game branch --show-current
 ## Active Entry Points
 
 - `index.html` - city-pop / red-thread opening overlay and main entry menu
-- `pages/anthology.html` - active main-line anthology
-- `pages/chloe.html` - Chloe side experiment
-- `playtest-en/index.html` - isolated English playtest snapshot, may lag behind main line
+- `pages/anthology.html` - (Archived Prototype) visual novel anthology with Daniel/Julian/Sebastian
+- `pages/chloe.html` - (Archived Prototype) Chloe side experiment
 
 ## Current Design Baseline
 

@@ -76,29 +76,26 @@ Codex / Claude 不需要每次把整個 TOE 企劃資料夾都讀進來。新對
 這是一個互動故事遊戲，網頁形式（HTML + CSS + JS）。
 作者是動畫師，不是程式設計師，請以非技術性語言溝通。
 
-**目前有兩條線（以企劃資料夾 `RFD 現況總覽 v1.2.md` 為準；《專案定位說明 v1.0》只保留分線歷史）：**
-- **主線＝諷刺選集**——第一人稱滑卡約會，配對池裡有人類掠食者原型也有正常人，玩家自己分辨。**開發中。**
-- **Chloe 篇＝旁觀者零回饋實驗，已收尾、定為分支**，現階段不主動開發。
+**專案歷史與現況（2026-10-04 更新）：**
+- **歷史原型封存（Git Tag: `archive-v0.8-vn-anthology`）**：
+  - **諷刺選集（`pages/anthology.html`）**：第一人稱對話式選集（Daniel/Julian/Sebastian），已封存為視覺小說版歷史原型，不再作為主要擴充路徑。
+  - **Chloe 篇（`pages/chloe.html`）**：旁觀者零回饋實驗，已收尾封存。
+- **當前核心方向＝故事模擬器（Emergent Story Simulator）**：
+  - 核心啟發來自《RimWorld》、《Crusader Kings III》、《Free Cities》。
+  - 擺脫視覺小說寫死劇本與作者說教的缺點，採用「狀態機（State Machine）× 加權事件牌庫（Event Deck）× 行為日誌留白（Action Log）」，給予骨架並留下玩家腦補空間。
+  - 規劃與規格基準以 `RFD 全面系統圖 v0.1.canvas` 為主。
 
-**目錄結構（2026-06-21 整理）：根目錄只留一個 `index.html`，其餘頁面收進 `pages/`。**
+**目錄結構：根目錄只留一個 `index.html`，其餘頁面收進 `pages/`。**
 子頁的 css/js 路徑都用 `../`（如 `../css/style.css`、`../js/engine.js`）。
 
 **入口：**
-- `index.html` — **根目錄唯一的 HTML**，入口選單頁（目前公開入口只連到選集／Chloe）
+- `index.html` — **根目錄唯一的 HTML**，入口選單頁
 
-**主要檔案 — 諷刺選集（主線）：**
-- `pages/anthology.html` — 選集入口頁
-- `css/anthology.css` — 選集樣式（疊在 `css/style.css` 上）
-- `js/anthology/player-archetypes.js` — 玩家起始人生／資源資料
-- `js/anthology/engine.js` — 選集引擎（池子即選單、傷痕特質、識人之眼）
-- `js/anthology/sebastian.js`、`daniel.js`、`julian.js` — 各篇內容（EP1 愛情騙子、EP2 正常人、EP3 自戀型）
-
-**已退役試驗場：**
-- Julian 的主線試點頁與試點引擎已完成任務，主要機制已併回 `pages/anthology.html` / `js/anthology/engine.js`。
-- 之後如果在舊討論或舊 commit 看到 `julian-pilot`、`pilot-engine`、`pilot-characters`，把它們視為歷史脈絡，不要再當成現役入口或維護對象。
-
-**主要檔案 — Chloe 篇（分支）：**
-- `pages/chloe.html` — Chloe 主頁面（原 index.html，2026-06-17 改名）
+**歷史原型檔案（已封存，非任務需要不主動讀取）：**
+- `pages/anthology.html` — 視覺小說選集原型頁（Tag `archive-v0.8-vn-anthology`）
+- `css/anthology.css` — 選集樣式
+- `js/anthology/` — 舊選集引擎與劇本（`engine.js`、`player-archetypes.js`、`daniel.js`、`julian.js`、`sebastian.js`）
+- `pages/chloe.html` — Chloe 分支原型頁
 - `css/style.css` — 共用視覺樣式
 - `js/engine.js` — Chloe 引擎（SA 系統、結局、渲染）
 - `js/stories/chloe.js` — Chloe 故事內容

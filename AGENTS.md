@@ -76,25 +76,29 @@ Codex 不需要每次把整個 TOE 企劃資料夾都讀進來。新對話先用
 這是一個互動故事遊戲，網頁形式（HTML + CSS + JS）。
 作者是動畫師，不是程式設計師，請以非技術性語言溝通。
 
-**目前有兩條線：**
-- **主線＝諷刺選集**：第一人稱滑卡約會，配對池裡有人類掠食者原型，也有正常人，玩家自己分辨。這是目前主要開發線。
-- **Chloe 篇＝旁觀者零回饋實驗**：已收尾，保留為分支參考，不是目前主開發線。
+**專案歷史與現況（2026-10-04 更新）：**
+- **歷史原型封存（Git Tag: `archive-v0.8-vn-anthology`）**：
+  - **諷刺選集（`pages/anthology.html`）**：第一人稱對話式選集（Daniel/Julian/Sebastian），已封存為視覺小說版歷史原型，不再作為主要擴充路徑。
+  - **Chloe 篇（`pages/chloe.html`）**：旁觀者零回饋實驗，已收尾封存。
+- **當前核心方向＝故事模擬器（Emergent Story Simulator）**：
+  - 核心啟發來自《RimWorld》、《Crusader Kings III》、《Free Cities》。
+  - 擺脫視覺小說寫死劇本與作者說教的缺點，採用「狀態機（State Machine）× 加權事件牌庫（Event Deck）× 行為日誌留白（Action Log）」，給予骨架並留下玩家腦補空間。
+  - 規劃與規格基準以 `RFD 全面系統圖 v0.1.canvas` 為主。
 
-**主要檔案：**（2026-06-21 整理：根目錄只留 `index.html`，其餘頁面收進 `pages/`，子頁 css/js 路徑用 `../`）
-- `index.html` — 根目錄唯一 HTML，入口選單頁（目前公開入口只連到選集／Chloe）
-- `pages/anthology.html` — 諷刺選集（主線）入口
-- `css/anthology.css` — 主線選集樣式（疊在 `css/style.css` 上）
-- `js/anthology/player-archetypes.js` — 玩家起始人生／資源資料
-- `js/anthology/engine.js` — 主線選集引擎（池子即選單、持久化資源、傷痕特質、識人之眼）
-- `js/anthology/sebastian.js`、`daniel.js`、`julian.js` — 主線各篇內容
-- `pages/chloe.html` — Chloe 篇主頁面（原 index.html）
+**主要檔案：**
+- `index.html` — 根目錄唯一 HTML，入口選單頁
+- `pages/anthology.html` — （歷史原型）諷刺選集入口（Tag `archive-v0.8-vn-anthology`）
+- `css/anthology.css` — 歷史選集樣式
+- `js/anthology/` — 歷史選集引擎與劇本（非任務需要不主動讀取）
+- `pages/chloe.html` — （歷史原型）Chloe 篇主頁面
 - `css/style.css` — 共用視覺樣式
-- `js/engine.js` — Chloe 引擎（SA 系統、結局、渲染）
-- `js/stories/chloe.js` — Chloe 的故事內容（對話、選項、結局）
+- `js/engine.js` — Chloe 引擎
+- `js/stories/chloe.js` — Chloe 故事內容
 - `js/cases.js` — 結局頁面的參考案例資料庫
 
-**已退役：**
-- Julian 的主線試點頁與試點引擎已完成任務，機制已併回主線選集；不要再把它當成目前入口或維護目標。
+**已退役／刪除：**
+- `playtest-en/` 英文版 Playtest 已於 2026-10-04 徹底刪除。
+- Julian 的主線試點頁與試點引擎已退役。
 
 **新增角色：** 作者會填《選集 角色設定卡 模板 v1》（在企劃資料夾），請照 `docs/新增角色-轉檔指南.md` 把它轉成角色檔並接進遊戲。
 
